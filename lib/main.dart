@@ -3,8 +3,10 @@ import 'package:provider/provider.dart';
 import 'providers/subject_provider.dart';
 import 'providers/study_record_provider.dart';
 import 'providers/goal_provider.dart';
+import 'pages/home_page.dart';
 import 'pages/subjects_page.dart';
 import 'pages/summary_page.dart';
+import 'pages/calendar_page.dart';
 
 void main() {
   runApp(const MyApp());
@@ -28,8 +30,8 @@ class MyApp extends StatelessWidget {
           useMaterial3: true,
           scaffoldBackgroundColor: const Color(0xFFF5F7FB),
         colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color(0xFF87CEEB),
-        ),
+            seedColor: const Color(0xFF9C27B0),
+          ),
           textTheme: const TextTheme(
             bodyMedium: TextStyle(fontFamily: 'Roboto', fontSize: 16),
           ),
@@ -55,6 +57,7 @@ class _HomePageState extends State<HomePage> {
   static const List<Widget> _pages = <Widget>[
     SubjectsPage(),
     SummaryPage(),
+    CalendarPage(),
   ];
 
   void _onItemTapped(int index) {
@@ -99,9 +102,14 @@ class _HomePageState extends State<HomePage> {
               activeIcon: Icon(Icons.bar_chart, size: 28),
               label: 'Summary',
             ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.calendar_today_outlined),
+              activeIcon: Icon(Icons.calendar_today, size: 28),
+              label: 'Calendar',
+            ),
           ],
           currentIndex: _selectedIndex,
-          selectedItemColor: const Color(0xFF87CEEB), // sky blue
+          selectedItemColor: const Color(0xFF9C27B0), // purple
           unselectedItemColor: Theme.of(context).colorScheme.onSurfaceVariant,
           selectedLabelStyle: const TextStyle(fontWeight: FontWeight.bold),
           unselectedLabelStyle: const TextStyle(fontWeight: FontWeight.w500),

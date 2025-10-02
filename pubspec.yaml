@@ -54,6 +54,9 @@ dependencies:
   fl_chart: ^0.66.1
   flutter_launcher_icons: ^0.13.1
 
+  # Calendar view
+  table_calendar: ^3.0.9
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

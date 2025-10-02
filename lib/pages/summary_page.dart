@@ -17,6 +17,7 @@ class _SummaryPageState extends State<SummaryPage> with TickerProviderStateMixin
   List<Map<String, dynamic>> _summary = [];
   List<Subject> _subjects = [];
   String _period = 'week';
+  String? _selectedCategory;
   late TabController _tabController;
 
   String formatDuration(double hours) {
@@ -40,6 +41,19 @@ class _SummaryPageState extends State<SummaryPage> with TickerProviderStateMixin
 
   Goal? _goal;
   double _progressPercent = 0.0;
+
+  List<String> get _categories => _subjects.map((s) => s.category).where((c) => c != null).cast<String>().toSet().toList();
+
+  List<Map<String, dynamic>> get _filteredSummary {
+    if (_selectedCategory == null) return _summary;
+    final filteredSubjects = _subjects.where((s) => s.category == _selectedCategory).toList();
+    return _summary.where((item) => filteredSubjects.any((s) => s.id == item['subject_id'])).toList();
+  }
+
+  List<Subject> get _filteredSubjects {
+    if (_selectedCategory == null) return _subjects;
+    return _subjects.where((s) => s.category == _selectedCategory).toList();
+  }
 
   @override
   void initState() {
@@ -182,13 +196,49 @@ class _SummaryPageState extends State<SummaryPage> with TickerProviderStateMixin
               ],
             ),
           ),
+          // Category Filter
+          if (_categories.isNotEmpty)
+            Container(
+              color: const Color(0xFF87CEEB),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              child: Row(
+                children: [
+                  const Text(
+                    'Filter by Category:',
+                    style: TextStyle(color: Colors.white, fontSize: 14),
+                  ),
+                  const SizedBox(width: 8),
+                  DropdownButton<String>(
+                    value: _selectedCategory,
+                    hint: const Text('All', style: TextStyle(color: Colors.white)),
+                    dropdownColor: const Color(0xFF87CEEB),
+                    style: const TextStyle(color: Colors.white),
+                    items: [
+                      const DropdownMenuItem<String>(
+                        value: null,
+                        child: Text('All'),
+                      ),
+                      ..._categories.map((category) => DropdownMenuItem<String>(
+                            value: category,
+                            child: Text(category),
+                          )),
+                    ],
+                    onChanged: (value) {
+                      setState(() {
+                        _selectedCategory = value;
+                      });
+                    },
+                  ),
+                ],
+              ),
+            ),
 
           // Body
           Expanded(
-            child: _summary.isEmpty
+            child: _filteredSummary.isEmpty
                 ? Center(
                     child: Text(
-                      "No study records this $_period.\nStart learning 📚",
+                      "No study records this $_period${_selectedCategory != null ? ' for $_selectedCategory' : ''}.\nStart learning 📚",
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontSize: 16,
@@ -212,17 +262,17 @@ class _SummaryPageState extends State<SummaryPage> with TickerProviderStateMixin
                             color: Theme.of(context).colorScheme.surface,
                             child: Padding(
                               padding: const EdgeInsets.all(16),
-                              child: _summary.length <= 5
+                              child: _filteredSummary.length <= 5
                                   ? PieChart(
                                       PieChartData(
                                         sectionsSpace: 4,
                                         centerSpaceRadius: 40,
                                         borderData: FlBorderData(show: false),
-                                        sections: _summary.asMap().entries.map((entry) {
+                                        sections: _filteredSummary.asMap().entries.map((entry) {
                                           final index = entry.key;
                                           final item = entry.value;
                                           final hours = item['total_duration'] / 60.0;
-                                          final subject = _subjects.firstWhere(
+                                          final subject = _filteredSubjects.firstWhere(
                                             (s) => s.id == item['subject_id'],
                                             orElse: () => Subject(id: 0, name: 'Deleted'),
                                           );
@@ -242,7 +292,7 @@ class _SummaryPageState extends State<SummaryPage> with TickerProviderStateMixin
                                     )
                                   : BarChart(
                                       BarChartData(
-                                        barGroups: _summary.asMap().entries.map((entry) {
+                                        barGroups: _filteredSummary.asMap().entries.map((entry) {
                                           final index = entry.key;
                                           final item = entry.value;
                                           final hours = item['total_duration'] / 60.0;
@@ -263,9 +313,9 @@ class _SummaryPageState extends State<SummaryPage> with TickerProviderStateMixin
                                               showTitles: true,
                                               getTitlesWidget: (value, meta) {
                                                 final index = value.toInt();
-                                                if (index >= 0 && index < _summary.length) {
-                                                  final subject = _subjects.firstWhere(
-                                                    (s) => s.id == _summary[index]['subject_id'],
+                                                if (index >= 0 && index < _filteredSummary.length) {
+                                                  final subject = _filteredSubjects.firstWhere(
+                                                    (s) => s.id == _filteredSummary[index]['subject_id'],
                                                     orElse: () => Subject(id: 0, name: 'Deleted'),
                                                   );
                                                   return Text(
@@ -297,10 +347,10 @@ class _SummaryPageState extends State<SummaryPage> with TickerProviderStateMixin
                         flex: 5,
                         child: ListView.builder(
                           padding: const EdgeInsets.symmetric(horizontal: 16),
-                          itemCount: _summary.length,
+                          itemCount: _filteredSummary.length,
                           itemBuilder: (context, index) {
-                            final item = _summary[index];
-                            final subject = _subjects.firstWhere(
+                            final item = _filteredSummary[index];
+                            final subject = _filteredSubjects.firstWhere(
                               (s) => s.id == item['subject_id'],
                               orElse: () => Subject(id: 0, name: 'Deleted'),
                             );

@@ -34,7 +34,7 @@ class _SubjectsPageState extends State<SubjectsPage> {
             padding: const EdgeInsets.fromLTRB(20, 60, 20, 30),
             width: double.infinity,
           decoration: BoxDecoration(
-            color: const Color(0xFF87CEEB), // sky blue
+            color: const Color(0xFF9C27B0), // purple
             borderRadius: BorderRadius.only(
               bottomLeft: Radius.circular(28),
               bottomRight: Radius.circular(28),
@@ -113,13 +113,26 @@ class _SubjectsPageState extends State<SubjectsPage> {
                               ),
                               const SizedBox(width: 14),
                               Expanded(
-                                child: Text(
-                                  subject.name,
-                                  style: TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.w600,
-                                    color: Theme.of(context).colorScheme.onSurface,
-                                  ),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      subject.name,
+                                      style: TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.w600,
+                                        color: Theme.of(context).colorScheme.onSurface,
+                                      ),
+                                    ),
+                                    if (subject.category != null && subject.category!.isNotEmpty)
+                                      Text(
+                                        subject.category!,
+                                        style: TextStyle(
+                                          fontSize: 14,
+                                          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+                                        ),
+                                      ),
+                                  ],
                                 ),
                               ),
                               IconButton(
@@ -163,6 +176,8 @@ class _SubjectsPageState extends State<SubjectsPage> {
         TextEditingController(text: isEditing ? subject.name : '');
     final goalController = TextEditingController(
         text: isEditing ? (subject.weeklyGoalMinutes / 60).toStringAsFixed(1) : '0');
+    final categoryController =
+        TextEditingController(text: isEditing ? subject.category ?? '' : '');
 
     showDialog(
       context: context,
@@ -188,6 +203,14 @@ class _SubjectsPageState extends State<SubjectsPage> {
                 border: OutlineInputBorder(),
               ),
             ),
+            const SizedBox(height: 16),
+            TextField(
+              controller: categoryController,
+              decoration: const InputDecoration(
+                labelText: 'Category (optional)',
+                border: OutlineInputBorder(),
+              ),
+            ),
           ],
         ),
         actions: [
@@ -205,16 +228,17 @@ class _SubjectsPageState extends State<SubjectsPage> {
             ),
             onPressed: () async {
               final name = nameController.text.trim();
-              final goalMinutes = int.tryParse(goalController.text) ?? 0;
+              final goalMinutes = (double.tryParse(goalController.text) ?? 0) * 60;
+              final category = categoryController.text.trim().isEmpty ? null : categoryController.text.trim();
               if (name.isNotEmpty) {
                 if (isEditing) {
                   final updatedSubject =
-                      Subject(id: subject!.id, name: name, weeklyGoalMinutes: goalMinutes);
+                      Subject(id: subject!.id, name: name, weeklyGoalMinutes: goalMinutes.toInt(), category: category);
                   await context
                       .read<SubjectProvider>()
                       .updateSubject(updatedSubject);
                 } else {
-                  final newSubject = Subject(name: name, weeklyGoalMinutes: goalMinutes);
+                  final newSubject = Subject(name: name, weeklyGoalMinutes: goalMinutes.toInt(), category: category);
                   await context.read<SubjectProvider>().addSubject(newSubject);
                 }
                 Navigator.pop(context);
