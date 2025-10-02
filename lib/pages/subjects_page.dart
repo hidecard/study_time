@@ -151,33 +151,15 @@ class _SubjectsPageState extends State<SubjectsPage> {
         ],
       ),
 
-      // 🔹 Floating Gradient Add Button
-      floatingActionButton: Container(
-        decoration: BoxDecoration(
-          gradient: const LinearGradient(
-            colors: [Color(0xFF6A8DFF), Color(0xFF3B6BFF)],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
+      // 🔹 Floating Add Button
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => _showSubjectDialog(),
+        backgroundColor: const Color(0xFF87CEEB),
+        foregroundColor: Colors.white,
+        shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(18),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.2),
-              blurRadius: 12,
-              offset: const Offset(0, 6),
-            ),
-          ],
         ),
-        child: FloatingActionButton(
-          onPressed: () => _showSubjectDialog(),
-          backgroundColor: Colors.transparent, // transparent to show gradient
-          elevation: 0,
-          foregroundColor: Colors.white, // icon color
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(18),
-          ),
-          child: const Icon(Icons.add, size: 32),
-        ),
+        child: const Icon(Icons.add, size: 32),
       ),
     );
   }

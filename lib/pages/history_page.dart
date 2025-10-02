@@ -135,11 +135,11 @@ class _HistoryPageState extends State<HistoryPage> {
                 const SizedBox(height: 16),
                 ListTile(
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                  tileColor: Colors.grey[100],
+                  tileColor: Theme.of(context).colorScheme.surfaceVariant,
                   title: Text(startTime == null
                       ? 'Select Start Time'
                       : DateFormat('yyyy-MM-dd HH:mm').format(startTime!)),
-                  trailing: const Icon(Icons.calendar_today, size: 24, color: Colors.blueAccent),
+                  trailing: Icon(Icons.calendar_today, size: 24, color: Theme.of(context).colorScheme.primary),
                   onTap: () async {
                     final picked = await showDatePicker(
                       context: context,
@@ -167,11 +167,11 @@ class _HistoryPageState extends State<HistoryPage> {
                 const SizedBox(height: 12),
                 ListTile(
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                  tileColor: Colors.grey[100],
+                  tileColor: Theme.of(context).colorScheme.surfaceVariant,
                   title: Text(endTime == null
                       ? 'Select End Time'
                       : DateFormat('yyyy-MM-dd HH:mm').format(endTime!)),
-                  trailing: const Icon(Icons.calendar_today, size: 24, color: Colors.blueAccent),
+                  trailing: Icon(Icons.calendar_today, size: 24, color: Theme.of(context).colorScheme.primary),
                   onTap: () async {
                     final picked = await showDatePicker(
                       context: context,
@@ -202,7 +202,7 @@ class _HistoryPageState extends State<HistoryPage> {
                   decoration: InputDecoration(
                     labelText: 'Description (optional)',
                     filled: true,
-                    fillColor: Colors.grey[100],
+                    fillColor: Theme.of(context).colorScheme.surfaceVariant,
                     border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                   ),
                 ),
@@ -222,7 +222,7 @@ class _HistoryPageState extends State<HistoryPage> {
                   alignment: Alignment.centerRight,
                   child: ElevatedButton.icon(
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF3B6BFF),
+                      backgroundColor: const Color(0xFF87CEEB),
                       foregroundColor: Colors.white,
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                     ),

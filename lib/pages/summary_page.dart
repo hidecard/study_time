@@ -159,7 +159,7 @@ class _SummaryPageState extends State<SummaryPage> with TickerProviderStateMixin
                                     );
                                     return PieChartSectionData(
                                       value: hours,
-                                      title: "${subject.name}\n${formatDuration(hours)}",
+                          title: subject.name,
                                       color: _chartColors[index % _chartColors.length],
                                       radius: 60,
                                       titleStyle: const TextStyle(

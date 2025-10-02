@@ -25,9 +25,9 @@ class MyApp extends StatelessWidget {
         theme: ThemeData(
           useMaterial3: true,
           scaffoldBackgroundColor: const Color(0xFFF5F7FB),
-          colorScheme: ColorScheme.fromSeed(
-            seedColor: const Color(0xFF3B6BFF),
-          ),
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: const Color(0xFF87CEEB),
+        ),
           textTheme: const TextTheme(
             bodyMedium: TextStyle(fontFamily: 'Roboto', fontSize: 16),
           ),
