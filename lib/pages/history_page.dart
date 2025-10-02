@@ -43,7 +43,8 @@ class _HistoryPageState extends State<HistoryPage> {
                 final durationHours = record.duration / 60;
 
                 return Card(
-                  margin: const EdgeInsets.all(8.0),
+                  margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  elevation: 2,
                   child: ListTile(
                     title: Text('${DateFormat('yyyy-MM-dd HH:mm').format(start)} - ${DateFormat('HH:mm').format(end)}'),
                     subtitle: Text('Duration: ${durationHours.toStringAsFixed(1)} hours\n${record.description ?? ''}'),

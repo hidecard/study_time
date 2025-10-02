@@ -77,16 +77,17 @@ class _SummaryPageState extends State<SummaryPage> with TickerProviderStateMixin
       );
     }
 
-    final barGroups = _summary.map((item) {
+    final pieSections = _summary.map((item) {
       final hours = item['total_duration'] / 60.0;
-      return BarChartGroupData(
-        x: item['subject_id'],
-        barRods: [
-          BarChartRodData(
-            toY: hours,
-            color: Colors.blue,
-          ),
-        ],
+      final subject = _subjects.firstWhere(
+        (s) => s.id == item['subject_id'],
+        orElse: () => Subject(id: 0, name: 'Deleted'),
+      );
+      return PieChartSectionData(
+        value: hours,
+        title: '${subject.name}\n${hours.toStringAsFixed(1)}h',
+        color: [Colors.lightBlue, Colors.orange][item['subject_id'] % 2],
+        radius: 50,
       );
     }).toList();
 
@@ -105,31 +106,15 @@ class _SummaryPageState extends State<SummaryPage> with TickerProviderStateMixin
       body: Column(
         children: [
           Expanded(
-            child: BarChart(
-              BarChartData(
-                barGroups: barGroups,
-                titlesData: FlTitlesData(
-                  bottomTitles: AxisTitles(
-                    sideTitles: SideTitles(
-                      showTitles: true,
-                      getTitlesWidget: (value, meta) {
-                        final subject = _subjects.firstWhere(
-                          (s) => s.id == value.toInt(),
-                          orElse: () => Subject(id: 0, name: 'Deleted'),
-                        );
-                        return Text(subject.name, style: const TextStyle(fontSize: 10));
-                      },
-                    ),
-                  ),
-                  leftTitles: AxisTitles(
-                    sideTitles: SideTitles(
-                      showTitles: true,
-                      reservedSize: 40,
-                    ),
+            child: Card(
+              margin: const EdgeInsets.all(8),
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: PieChart(
+                  PieChartData(
+                    sections: pieSections,
                   ),
                 ),
-                borderData: FlBorderData(show: true),
-                gridData: FlGridData(show: true),
               ),
             ),
           ),
@@ -144,9 +129,12 @@ class _SummaryPageState extends State<SummaryPage> with TickerProviderStateMixin
                 );
                 final sessions = item['session_count'];
                 final hours = item['total_duration'] / 60.0;
-                return ListTile(
-                  title: Text(subject.name),
-                  subtitle: Text('$sessions sessions, ${hours.toStringAsFixed(1)} hours'),
+                return Card(
+                  margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  child: ListTile(
+                    title: Text(subject.name),
+                    subtitle: Text('$sessions sessions, ${hours.toStringAsFixed(1)} hours'),
+                  ),
                 );
               },
             ),

@@ -23,7 +23,11 @@ class MyApp extends StatelessWidget {
         title: 'Study Time Tracker',
         theme: ThemeData(
           primarySwatch: Colors.blue,
+          colorScheme: ColorScheme.fromSwatch(primarySwatch: Colors.blue).copyWith(secondary: Colors.orange),
+          scaffoldBackgroundColor: Colors.grey[50],
         ),
+        darkTheme: ThemeData.dark(),
+        themeMode: ThemeMode.system,
         home: const HomePage(),
       ),
     );
@@ -67,6 +71,8 @@ class _HomePageState extends State<HomePage> {
           ),
         ],
         currentIndex: _selectedIndex,
+        selectedItemColor: Colors.lightBlue,
+        unselectedItemColor: Colors.orange,
         onTap: _onItemTapped,
       ),
     );
