@@ -16,6 +16,15 @@ class _SummaryPageState extends State<SummaryPage> with TickerProviderStateMixin
   String _period = 'week';
   late TabController _tabController;
 
+  final List<Color> _chartColors = [
+    Colors.blueAccent,
+    Colors.pinkAccent,
+    Colors.greenAccent,
+    Colors.orangeAccent,
+    Colors.purpleAccent,
+    Colors.tealAccent,
+  ];
+
   @override
   void initState() {
     super.initState();
@@ -60,42 +69,17 @@ class _SummaryPageState extends State<SummaryPage> with TickerProviderStateMixin
 
   @override
   Widget build(BuildContext context) {
-    if (_summary.isEmpty) {
-      return Scaffold(
-        appBar: AppBar(
-          title: Text('${_period.toUpperCase()} Summary'),
-          bottom: TabBar(
-            controller: _tabController,
-            tabs: const [
-              Tab(text: 'Weekly'),
-              Tab(text: 'Monthly'),
-              Tab(text: 'Yearly'),
-            ],
-          ),
-        ),
-        body: Center(child: Text('No study records this $_period.')),
-      );
-    }
-
-    final pieSections = _summary.map((item) {
-      final hours = item['total_duration'] / 60.0;
-      final subject = _subjects.firstWhere(
-        (s) => s.id == item['subject_id'],
-        orElse: () => Subject(id: 0, name: 'Deleted'),
-      );
-      return PieChartSectionData(
-        value: hours,
-        title: '${subject.name}\n${hours.toStringAsFixed(1)}h',
-        color: [Colors.lightBlue, Colors.orange][item['subject_id'] % 2],
-        radius: 50,
-      );
-    }).toList();
-
     return Scaffold(
       appBar: AppBar(
-        title: Text('${_period.toUpperCase()} Summary'),
+        title: const Text(
+          "Study Summary",
+          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+        ),
+        backgroundColor: const Color(0xFF3B6BFF),
         bottom: TabBar(
           controller: _tabController,
+          indicatorColor: Colors.white,
+          labelStyle: const TextStyle(fontWeight: FontWeight.bold),
           tabs: const [
             Tab(text: 'Weekly'),
             Tab(text: 'Monthly'),
@@ -103,44 +87,112 @@ class _SummaryPageState extends State<SummaryPage> with TickerProviderStateMixin
           ],
         ),
       ),
-      body: Column(
-        children: [
-          Expanded(
-            child: Card(
-              margin: const EdgeInsets.all(8),
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: PieChart(
-                  PieChartData(
-                    sections: pieSections,
-                  ),
+      body: _summary.isEmpty
+          ? Center(
+              child: Text(
+                "No study records this $_period.\nStart learning 📚",
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 16,
+                  color: Colors.grey[600],
+                  fontWeight: FontWeight.w500,
                 ),
               ),
-            ),
-          ),
-          Expanded(
-            child: ListView.builder(
-              itemCount: _summary.length,
-              itemBuilder: (context, index) {
-                final item = _summary[index];
-                final subject = _subjects.firstWhere(
-                  (s) => s.id == item['subject_id'],
-                  orElse: () => Subject(id: 0, name: 'Deleted'),
-                );
-                final sessions = item['session_count'];
-                final hours = item['total_duration'] / 60.0;
-                return Card(
-                  margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                  child: ListTile(
-                    title: Text(subject.name),
-                    subtitle: Text('$sessions sessions, ${hours.toStringAsFixed(1)} hours'),
+            )
+          : Column(
+              children: [
+                // 🔹 Pie Chart Section
+                Expanded(
+                  flex: 4,
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Card(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      elevation: 4,
+                      child: Padding(
+                        padding: const EdgeInsets.all(16),
+                        child: PieChart(
+                          PieChartData(
+                            sectionsSpace: 4,
+                            centerSpaceRadius: 40,
+                            borderData: FlBorderData(show: false),
+                            sections: _summary.asMap().entries.map((entry) {
+                              final index = entry.key;
+                              final item = entry.value;
+                              final hours = item['total_duration'] / 60.0;
+                              final subject = _subjects.firstWhere(
+                                (s) => s.id == item['subject_id'],
+                                orElse: () => Subject(id: 0, name: 'Deleted'),
+                              );
+                              return PieChartSectionData(
+                                value: hours,
+                                title: "${hours.toStringAsFixed(1)}h",
+                                color: _chartColors[index % _chartColors.length],
+                                radius: 60,
+                                titleStyle: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 12,
+                                  color: Colors.white,
+                                ),
+                              );
+                            }).toList(),
+                          ),
+                        ),
+                      ),
+                    ),
                   ),
-                );
-              },
+                ),
+
+                // 🔹 List Section
+                Expanded(
+                  flex: 5,
+                  child: ListView.builder(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    itemCount: _summary.length,
+                    itemBuilder: (context, index) {
+                      final item = _summary[index];
+                      final subject = _subjects.firstWhere(
+                        (s) => s.id == item['subject_id'],
+                        orElse: () => Subject(id: 0, name: 'Deleted'),
+                      );
+                      final sessions = item['session_count'];
+                      final hours = item['total_duration'] / 60.0;
+
+                      return Container(
+                        margin: const EdgeInsets.only(bottom: 12),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(16),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.05),
+                              blurRadius: 6,
+                              offset: const Offset(2, 3),
+                            )
+                          ],
+                        ),
+                        child: ListTile(
+                          leading: CircleAvatar(
+                            backgroundColor: _chartColors[index % _chartColors.length],
+                            child: const Icon(Icons.book, color: Colors.white),
+                          ),
+                          title: Text(
+                            subject.name,
+                            style: const TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                          subtitle: Text(
+                            "$sessions sessions • ${hours.toStringAsFixed(1)} hours",
+                            style: const TextStyle(color: Colors.black54),
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ],
             ),
-          ),
-        ],
-      ),
     );
   }
 }

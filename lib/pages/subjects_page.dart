@@ -97,7 +97,8 @@ class _SubjectsPageState extends State<SubjectsPage> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => HistoryPage(subject: subject),
+                              builder: (context) =>
+                                  HistoryPage(subject: subject),
                             ),
                           );
                         },
@@ -119,7 +120,8 @@ class _SubjectsPageState extends State<SubjectsPage> {
                             children: [
                               CircleAvatar(
                                 backgroundColor: Colors.white,
-                                child: const Icon(Icons.book, color: Colors.blue),
+                                child: const Icon(Icons.book,
+                                    color: Colors.blue),
                               ),
                               const SizedBox(width: 14),
                               Expanded(
@@ -132,12 +134,16 @@ class _SubjectsPageState extends State<SubjectsPage> {
                                 ),
                               ),
                               IconButton(
-                                icon: const Icon(Icons.edit, color: Colors.black54),
-                                onPressed: () => _showSubjectDialog(subject: subject),
+                                icon: const Icon(Icons.edit,
+                                    color: Colors.black54),
+                                onPressed: () =>
+                                    _showSubjectDialog(subject: subject),
                               ),
                               IconButton(
-                                icon: const Icon(Icons.delete, color: Colors.red),
-                                onPressed: () => _deleteSubject(subject.id!),
+                                icon: const Icon(Icons.delete,
+                                    color: Colors.red),
+                                onPressed: () =>
+                                    _deleteSubject(subject.id!),
                               ),
                             ],
                           ),
@@ -149,19 +155,41 @@ class _SubjectsPageState extends State<SubjectsPage> {
         ],
       ),
 
-      // 🔹 Floating Add Button
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => _showSubjectDialog(),
-        backgroundColor: const Color(0xFF3B6BFF),
-        elevation: 6,
-        child: const Icon(Icons.add, size: 28),
+      // 🔹 Floating Gradient Add Button
+      floatingActionButton: Container(
+        decoration: BoxDecoration(
+          gradient: const LinearGradient(
+            colors: [Color(0xFF6A8DFF), Color(0xFF3B6BFF)],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          borderRadius: BorderRadius.circular(18),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.2),
+              blurRadius: 12,
+              offset: const Offset(0, 6),
+            ),
+          ],
+        ),
+        child: FloatingActionButton(
+          onPressed: () => _showSubjectDialog(),
+          backgroundColor: Colors.transparent, // transparent to show gradient
+          elevation: 0,
+          foregroundColor: Colors.white, // icon color
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(18),
+          ),
+          child: const Icon(Icons.add, size: 32),
+        ),
       ),
     );
   }
 
   void _showSubjectDialog({Subject? subject}) {
     final isEditing = subject != null;
-    final controller = TextEditingController(text: isEditing ? subject.name : '');
+    final controller =
+        TextEditingController(text: isEditing ? subject.name : '');
 
     showDialog(
       context: context,
@@ -191,8 +219,11 @@ class _SubjectsPageState extends State<SubjectsPage> {
               final name = controller.text.trim();
               if (name.isNotEmpty) {
                 if (isEditing) {
-                  final updatedSubject = Subject(id: subject!.id, name: name);
-                  await context.read<SubjectProvider>().updateSubject(updatedSubject);
+                  final updatedSubject =
+                      Subject(id: subject!.id, name: name);
+                  await context
+                      .read<SubjectProvider>()
+                      .updateSubject(updatedSubject);
                 } else {
                   final newSubject = Subject(name: name);
                   await context.read<SubjectProvider>().addSubject(newSubject);
@@ -213,7 +244,8 @@ class _SubjectsPageState extends State<SubjectsPage> {
       builder: (context) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         title: const Text('Delete Subject'),
-        content: const Text('Are you sure you want to delete this subject?'),
+        content:
+            const Text('Are you sure you want to delete this subject?'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),

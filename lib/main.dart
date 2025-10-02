@@ -20,11 +20,17 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => StudyRecordProvider()),
       ],
       child: MaterialApp(
+        debugShowCheckedModeBanner: false,
         title: 'Study Time Tracker',
         theme: ThemeData(
-          primarySwatch: Colors.blue,
-          colorScheme: ColorScheme.fromSwatch(primarySwatch: Colors.blue).copyWith(secondary: Colors.orange),
-          scaffoldBackgroundColor: Colors.grey[50],
+          useMaterial3: true,
+          scaffoldBackgroundColor: const Color(0xFFF5F7FB),
+          colorScheme: ColorScheme.fromSeed(
+            seedColor: const Color(0xFF3B6BFF),
+          ),
+          textTheme: const TextTheme(
+            bodyMedium: TextStyle(fontFamily: 'Roboto', fontSize: 16),
+          ),
         ),
         darkTheme: ThemeData.dark(),
         themeMode: ThemeMode.system,
@@ -59,21 +65,46 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: _pages[_selectedIndex],
-      bottomNavigationBar: BottomNavigationBar(
-        items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-            icon: Icon(Icons.book),
-            label: 'Subjects',
+
+      // 🔹 Custom Bottom Navigation Bar
+      bottomNavigationBar: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: const BorderRadius.only(
+            topLeft: Radius.circular(22),
+            topRight: Radius.circular(22),
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.bar_chart),
-            label: 'Summary',
-          ),
-        ],
-        currentIndex: _selectedIndex,
-        selectedItemColor: Colors.lightBlue,
-        unselectedItemColor: Colors.orange,
-        onTap: _onItemTapped,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.06),
+              blurRadius: 8,
+              offset: const Offset(0, -3),
+            )
+          ],
+        ),
+        child: BottomNavigationBar(
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          type: BottomNavigationBarType.fixed,
+          items: const <BottomNavigationBarItem>[
+            BottomNavigationBarItem(
+              icon: Icon(Icons.book_outlined),
+              activeIcon: Icon(Icons.book, size: 28),
+              label: 'Subjects',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.bar_chart_outlined),
+              activeIcon: Icon(Icons.bar_chart, size: 28),
+              label: 'Summary',
+            ),
+          ],
+          currentIndex: _selectedIndex,
+          selectedItemColor: const Color(0xFF3B6BFF), // Main accent blue
+          unselectedItemColor: Color(0xFF9E9E9E), // Soft grey
+          selectedLabelStyle: const TextStyle(fontWeight: FontWeight.bold),
+          unselectedLabelStyle: const TextStyle(fontWeight: FontWeight.w500),
+          onTap: _onItemTapped,
+        ),
       ),
     );
   }
