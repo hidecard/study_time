@@ -13,4 +13,5 @@
 - [x] Run flutter pub get to install dependencies
 - [x] Test the app functionality (flutter doctor passed, code ready)
 - [x] Add duration input box in add study record dialog
-- [ ] Add weekly, monthly, yearly views in summary page
+- [x] Add weekly, monthly, yearly views in summary page
+- [x] Fix error when subject is deleted but records exist

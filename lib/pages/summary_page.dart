@@ -113,7 +113,10 @@ class _SummaryPageState extends State<SummaryPage> with TickerProviderStateMixin
                     sideTitles: SideTitles(
                       showTitles: true,
                       getTitlesWidget: (value, meta) {
-                        final subject = _subjects.firstWhere((s) => s.id == value.toInt());
+                        final subject = _subjects.firstWhere(
+                          (s) => s.id == value.toInt(),
+                          orElse: () => Subject(id: 0, name: 'Deleted'),
+                        );
                         return Text(subject.name, style: const TextStyle(fontSize: 10));
                       },
                     ),
@@ -135,7 +138,10 @@ class _SummaryPageState extends State<SummaryPage> with TickerProviderStateMixin
               itemCount: _summary.length,
               itemBuilder: (context, index) {
                 final item = _summary[index];
-                final subject = _subjects.firstWhere((s) => s.id == item['subject_id']);
+                final subject = _subjects.firstWhere(
+                  (s) => s.id == item['subject_id'],
+                  orElse: () => Subject(id: 0, name: 'Deleted'),
+                );
                 final sessions = item['session_count'];
                 final hours = item['total_duration'] / 60.0;
                 return ListTile(
