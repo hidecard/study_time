@@ -26,7 +26,6 @@ class _SubjectsPageState extends State<SubjectsPage> {
     final subjects = subjectProvider.subjects;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F7FB),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -34,17 +33,13 @@ class _SubjectsPageState extends State<SubjectsPage> {
           Container(
             padding: const EdgeInsets.fromLTRB(20, 60, 20, 30),
             width: double.infinity,
-            decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                colors: [Color(0xFF6A8DFF), Color(0xFF3B6BFF)],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-              borderRadius: BorderRadius.only(
-                bottomLeft: Radius.circular(28),
-                bottomRight: Radius.circular(28),
-              ),
+          decoration: BoxDecoration(
+            color: const Color(0xFF87CEEB), // sky blue
+            borderRadius: BorderRadius.only(
+              bottomLeft: Radius.circular(28),
+              bottomRight: Radius.circular(28),
             ),
+          ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: const [
@@ -68,13 +63,13 @@ class _SubjectsPageState extends State<SubjectsPage> {
           // 🔹 Subject List / Empty State
           Expanded(
             child: subjects.isEmpty
-                ? const Center(
+                ? Center(
                     child: Text(
                       "No subjects yet.\nTap + to add one!",
                       textAlign: TextAlign.center,
                       style: TextStyle(
                           fontSize: 16,
-                          color: Colors.grey,
+                          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
                           fontWeight: FontWeight.w500),
                     ),
                   )
@@ -119,9 +114,9 @@ class _SubjectsPageState extends State<SubjectsPage> {
                           child: Row(
                             children: [
                               CircleAvatar(
-                                backgroundColor: Colors.white,
-                                child: const Icon(Icons.book,
-                                    color: Colors.blue),
+                                backgroundColor: Theme.of(context).colorScheme.primary,
+                                child: Icon(Icons.book,
+                                    color: Colors.white),
                               ),
                               const SizedBox(width: 14),
                               Expanded(
@@ -130,17 +125,18 @@ class _SubjectsPageState extends State<SubjectsPage> {
                                   style: const TextStyle(
                                     fontSize: 18,
                                     fontWeight: FontWeight.w600,
+                                    color: Colors.black,
                                   ),
                                 ),
                               ),
                               IconButton(
-                                icon: const Icon(Icons.edit, size: 24,
-                                    color: Colors.black54),
+                                icon: Icon(Icons.edit, size: 24,
+                                    color: Colors.black),
                                 onPressed: () =>
                                     _showSubjectDialog(subject: subject),
                               ),
                               IconButton(
-                                icon: const Icon(Icons.delete, size: 24,
+                                icon: Icon(Icons.delete, size: 24,
                                     color: Colors.red),
                                 onPressed: () =>
                                     _deleteSubject(subject.id!),
@@ -210,8 +206,8 @@ class _SubjectsPageState extends State<SubjectsPage> {
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF3B6BFF),
-              foregroundColor: Colors.white,
+              backgroundColor: Theme.of(context).colorScheme.primary,
+              foregroundColor: Theme.of(context).colorScheme.onPrimary,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(8),
               ),
@@ -254,7 +250,8 @@ class _SubjectsPageState extends State<SubjectsPage> {
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.red,
+              backgroundColor: Theme.of(context).colorScheme.error,
+              foregroundColor: Theme.of(context).colorScheme.onError,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(8),
               ),

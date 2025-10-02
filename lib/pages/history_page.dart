@@ -43,10 +43,10 @@ class _HistoryPageState extends State<HistoryPage> {
       appBar: AppBar(
         title: Text(
           '${widget.subject.name} History',
-          style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
         ),
-        backgroundColor: Colors.blueAccent,
-        iconTheme: const IconThemeData(color: Colors.white),
+        backgroundColor: const Color(0xFF87CEEB), // sky blue
+        iconTheme: IconThemeData(color: Theme.of(context).colorScheme.onPrimary),
         elevation: 4,
       ),
       body: records.isEmpty
@@ -72,20 +72,21 @@ class _HistoryPageState extends State<HistoryPage> {
                   margin: const EdgeInsets.symmetric(vertical: 6),
                   child: ListTile(
                     leading: CircleAvatar(
-                      backgroundColor: Colors.blueAccent,
+                      backgroundColor: Theme.of(context).colorScheme.primary,
                       child: Text(
                         DateFormat('d').format(start),
-                        style: const TextStyle(color: Colors.white),
+                        style: TextStyle(color: Theme.of(context).colorScheme.onPrimary),
                       ),
                     ),
                     title: Text(
                       '${DateFormat('MMM dd, yyyy').format(start)}',
-                      style: const TextStyle(fontWeight: FontWeight.bold),
+                      style: TextStyle(fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onSurface),
                     ),
                     subtitle: Text(
                       '${DateFormat('HH:mm').format(start)} - ${DateFormat('HH:mm').format(end)}\n'
                       '⏱ ${formatDuration(durationHours)}\n'
                       '${record.description ?? ''}',
+                      style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant),
                     ),
                     trailing: IconButton(
                       icon: const Icon(Icons.delete, size: 24, color: Colors.redAccent),
@@ -96,8 +97,8 @@ class _HistoryPageState extends State<HistoryPage> {
               },
             ),
       floatingActionButton: FloatingActionButton.extended(
-        backgroundColor: const Color(0xFF3B6BFF),
-        foregroundColor: Colors.white,
+        backgroundColor: Theme.of(context).colorScheme.primary,
+        foregroundColor: Theme.of(context).colorScheme.onPrimary,
         onPressed: () => _showAddRecordSheet(),
         icon: const Icon(Icons.add),
         label: const Text("Add Record"),
@@ -211,7 +212,7 @@ class _HistoryPageState extends State<HistoryPage> {
                   decoration: InputDecoration(
                     labelText: 'Duration (calculated)',
                     filled: true,
-                    fillColor: Colors.grey[100],
+                    fillColor: Theme.of(context).colorScheme.surfaceVariant,
                     border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                   ),
                   readOnly: true,

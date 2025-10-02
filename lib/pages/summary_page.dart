@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+iUimport 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import '../database_helper.dart';
 import '../models/subject.dart';
@@ -28,6 +28,13 @@ class _SummaryPageState extends State<SummaryPage> with TickerProviderStateMixin
   }
 
   final List<Color> _chartColors = [
+    const Color(0xFF87CEEB), // sky blue
+    const Color(0xFF5DADE2), // lighter sky blue
+    const Color(0xFF3498DB), // medium sky blue
+    const Color(0xFF2E86C1), // darker sky blue
+    const Color(0xFF2874A6), // even darker
+    const Color(0xFF1B4F72), // darkest sky blue
+  ];
     Colors.blueAccent,
     Colors.pinkAccent,
     Colors.greenAccent,
@@ -86,12 +93,12 @@ class _SummaryPageState extends State<SummaryPage> with TickerProviderStateMixin
           "Study Summary",
           style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
         ),
-        backgroundColor: const Color(0xFF3B6BFF),
+        backgroundColor: const Color(0xFF87CEEB), // sky blue
         bottom: TabBar(
           controller: _tabController,
-          indicatorColor: Colors.white,
-          labelColor: Colors.white,
-          unselectedLabelColor: Colors.white70,
+          indicatorColor: Theme.of(context).colorScheme.onPrimary,
+          labelColor: Theme.of(context).colorScheme.onPrimary,
+          unselectedLabelColor: Theme.of(context).colorScheme.onPrimary.withOpacity(0.7),
           labelStyle: const TextStyle(fontWeight: FontWeight.bold),
           tabs: const [
             Tab(text: 'Weekly'),
@@ -107,7 +114,7 @@ class _SummaryPageState extends State<SummaryPage> with TickerProviderStateMixin
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 16,
-                  color: Colors.grey[600],
+                  color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
                   fontWeight: FontWeight.w500,
                 ),
               ),
@@ -119,42 +126,43 @@ class _SummaryPageState extends State<SummaryPage> with TickerProviderStateMixin
                   flex: 4,
                   child: Padding(
                     padding: const EdgeInsets.all(16),
-                    child: Card(
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(20),
+          child: Card(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20),
+            ),
+            elevation: 4,
+            color: Theme.of(context).colorScheme.surface,
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: PieChart(
+                PieChartData(
+                  sectionsSpace: 4,
+                  centerSpaceRadius: 40,
+                  borderData: FlBorderData(show: false),
+                  sections: _summary.asMap().entries.map((entry) {
+                    final index = entry.key;
+                    final item = entry.value;
+                    final hours = item['total_duration'] / 60.0;
+                    final subject = _subjects.firstWhere(
+                      (s) => s.id == item['subject_id'],
+                      orElse: () => Subject(id: 0, name: 'Deleted'),
+                    );
+                    return PieChartSectionData(
+                      value: hours,
+                      title: "${subject.name}\n${formatDuration(hours)}",
+                      color: _chartColors[index % _chartColors.length],
+                      radius: 60,
+                      titleStyle: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 12,
+                        color: Colors.white,
                       ),
-                      elevation: 4,
-                      child: Padding(
-                        padding: const EdgeInsets.all(16),
-                        child: PieChart(
-                          PieChartData(
-                            sectionsSpace: 4,
-                            centerSpaceRadius: 40,
-                            borderData: FlBorderData(show: false),
-                            sections: _summary.asMap().entries.map((entry) {
-                              final index = entry.key;
-                              final item = entry.value;
-                              final hours = item['total_duration'] / 60.0;
-                              final subject = _subjects.firstWhere(
-                                (s) => s.id == item['subject_id'],
-                                orElse: () => Subject(id: 0, name: 'Deleted'),
-                              );
-                              return PieChartSectionData(
-                                value: hours,
-                                title: "${subject.name}\n${formatDuration(hours)}",
-                                color: _chartColors[index % _chartColors.length],
-                                radius: 60,
-                                titleStyle: const TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 12,
-                                  color: Colors.white,
-                                ),
-                              );
-                            }).toList(),
-                          ),
-                        ),
-                      ),
-                    ),
+                    );
+                  }).toList(),
+                ),
+              ),
+            ),
+          ),
                   ),
                 ),
 
@@ -173,34 +181,34 @@ class _SummaryPageState extends State<SummaryPage> with TickerProviderStateMixin
                       final sessions = item['session_count'];
                       final hours = item['total_duration'] / 60.0;
 
-                      return Container(
-                        margin: const EdgeInsets.only(bottom: 12),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(16),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.05),
-                              blurRadius: 6,
-                              offset: const Offset(2, 3),
-                            )
-                          ],
-                        ),
-                        child: ListTile(
-                          leading: CircleAvatar(
-                            backgroundColor: _chartColors[index % _chartColors.length],
-                            child: const Icon(Icons.book, color: Colors.white),
-                          ),
-                          title: Text(
-                            subject.name,
-                            style: const TextStyle(fontWeight: FontWeight.bold),
-                          ),
-                          subtitle: Text(
-                            "$sessions sessions • ${formatDuration(hours)}",
-                            style: const TextStyle(color: Colors.black54),
-                          ),
-                        ),
-                      );
+                return Container(
+                  margin: const EdgeInsets.only(bottom: 12),
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.surface,
+                    borderRadius: BorderRadius.circular(16),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Theme.of(context).colorScheme.shadow.withOpacity(0.05),
+                        blurRadius: 6,
+                        offset: const Offset(2, 3),
+                      )
+                    ],
+                  ),
+                  child: ListTile(
+                    leading: CircleAvatar(
+                      backgroundColor: _chartColors[index % _chartColors.length],
+                      child: const Icon(Icons.book, color: Colors.white),
+                    ),
+                    title: Text(
+                      subject.name,
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    subtitle: Text(
+                      "$sessions sessions • ${formatDuration(hours)}",
+                      style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant),
+                    ),
+                  ),
+                );
                     },
                   ),
                 ),

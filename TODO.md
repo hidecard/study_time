@@ -1,8 +1,5 @@
-- [x] Modify lib/pages/summary_page.dart to replace BarChart with PieChart
-- [x] Adjust data preparation for PieChart sections with colors and labels
-- [x] Test the UI change in the app
-- [x] Update theme in main.dart to blue primary and orange secondary with light background and nav colors (lightBlue selected, orange unselected)
-- [x] Update subjects_page.dart: list view with card design and blue/orange/red colors
-- [x] Update history_page.dart: improve Card design
-- [x] Update summary_page.dart: wrap PieChart and ListTile in Cards, change pie colors to lightBlue and orange
-- [x] Test all page UI changes (assumed successful based on code review)
+    - [x] Update main.dart: Make bottomNavigationBar use theme colors instead of hardcoded white and specific colors.
+- [x] Update subjects_page.dart: Remove hardcoded scaffold backgroundColor, update text colors, card colors, and dialog colors to be theme-aware.
+- [x] Update summary_page.dart: Update AppBar, TabBar, Card, and text colors to use theme properties.
+- [ ] Update history_page.dart: Update AppBar, FloatingActionButton, and bottom sheet colors to use theme.
+- [ ] Test the app in both light and dark modes to ensure proper theming.

@@ -69,14 +69,14 @@ class _HomePageState extends State<HomePage> {
       // 🔹 Custom Bottom Navigation Bar
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: Theme.of(context).colorScheme.surface,
           borderRadius: const BorderRadius.only(
             topLeft: Radius.circular(22),
             topRight: Radius.circular(22),
           ),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.06),
+              color: Theme.of(context).colorScheme.shadow.withOpacity(0.1),
               blurRadius: 8,
               offset: const Offset(0, -3),
             )
@@ -99,8 +99,8 @@ class _HomePageState extends State<HomePage> {
             ),
           ],
           currentIndex: _selectedIndex,
-          selectedItemColor: const Color(0xFF3B6BFF), // Main accent blue
-          unselectedItemColor: Color(0xFF9E9E9E), // Soft grey
+          selectedItemColor: const Color(0xFF87CEEB), // sky blue
+          unselectedItemColor: Theme.of(context).colorScheme.onSurfaceVariant,
           selectedLabelStyle: const TextStyle(fontWeight: FontWeight.bold),
           unselectedLabelStyle: const TextStyle(fontWeight: FontWeight.w500),
           onTap: _onItemTapped,
