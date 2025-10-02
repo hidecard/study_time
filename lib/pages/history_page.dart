@@ -82,11 +82,26 @@ class _HistoryPageState extends State<HistoryPage> {
                       '${DateFormat('MMM dd, yyyy').format(start)}',
                       style: TextStyle(fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onSurface),
                     ),
-                    subtitle: Text(
-                      '${DateFormat('HH:mm').format(start)} - ${DateFormat('HH:mm').format(end)}\n'
-                      '⏱ ${formatDuration(durationHours)}\n'
-                      '${record.description ?? ''}',
-                      style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant),
+                    subtitle: RichText(
+                      text: TextSpan(
+                        text: 'Date - ${DateFormat('MMM dd, yyyy').format(start)}\n'
+                              'Time - ${DateFormat('hh:mm a').format(start)} - ${DateFormat('hh:mm a').format(end)}\n'
+                              'Duration - ',
+                        style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant),
+                        children: [
+                          TextSpan(
+                            text: formatDuration(durationHours),
+                            style: TextStyle(
+                              color: Theme.of(context).colorScheme.primary,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          TextSpan(
+                            text: '\nDescription - ${record.description ?? '------'}',
+                            style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant),
+                          ),
+                        ],
+                      ),
                     ),
                     trailing: IconButton(
                       icon: const Icon(Icons.delete, size: 24, color: Colors.redAccent),
@@ -138,7 +153,7 @@ class _HistoryPageState extends State<HistoryPage> {
                   tileColor: Theme.of(context).colorScheme.surfaceVariant,
                   title: Text(startTime == null
                       ? 'Select Start Time'
-                      : DateFormat('yyyy-MM-dd HH:mm').format(startTime!)),
+                      : DateFormat('yyyy-MM-dd hh:mm a').format(startTime!)),
                   trailing: Icon(Icons.calendar_today, size: 24, color: Theme.of(context).colorScheme.primary),
                   onTap: () async {
                     final picked = await showDatePicker(
@@ -170,7 +185,7 @@ class _HistoryPageState extends State<HistoryPage> {
                   tileColor: Theme.of(context).colorScheme.surfaceVariant,
                   title: Text(endTime == null
                       ? 'Select End Time'
-                      : DateFormat('yyyy-MM-dd HH:mm').format(endTime!)),
+                      : DateFormat('yyyy-MM-dd hh:mm a').format(endTime!)),
                   trailing: Icon(Icons.calendar_today, size: 24, color: Theme.of(context).colorScheme.primary),
                   onTap: () async {
                     final picked = await showDatePicker(

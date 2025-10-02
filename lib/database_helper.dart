@@ -92,6 +92,7 @@ class DatabaseHelper {
       FROM study_records
       WHERE strftime('%W', start_time) = strftime('%W', 'now')
       GROUP BY subject_id
+      ORDER BY total_duration DESC
     ''');
   }
 
@@ -103,6 +104,11 @@ class DatabaseHelper {
   Future<int> deleteStudyRecord(int id) async {
     Database db = await database;
     return await db.delete('study_records', where: 'id = ?', whereArgs: [id]);
+  }
+
+  Future<int> deleteStudyRecordsBySubject(int subjectId) async {
+    Database db = await database;
+    return await db.delete('study_records', where: 'subject_id = ?', whereArgs: [subjectId]);
   }
 
   Future<List<Map<String, dynamic>>> rawQuery(String sql) async {

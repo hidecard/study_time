@@ -28,11 +28,11 @@ class _SummaryPageState extends State<SummaryPage> with TickerProviderStateMixin
   }
 
   final List<Color> _chartColors = [
-    Colors.blue.shade100,
-    Colors.pink.shade100,
-    Colors.green.shade100,
-    Colors.orange.shade100,
-    Colors.purple.shade100,
+    Colors.blue.shade700,
+    Colors.pink.shade700,
+    Colors.green.shade700,
+    Colors.orange.shade700,
+    Colors.purple.shade700,
   ];
 
   @override
@@ -68,6 +68,7 @@ class _SummaryPageState extends State<SummaryPage> with TickerProviderStateMixin
         FROM study_records
         WHERE $whereClause
         GROUP BY subject_id
+        ORDER BY total_duration DESC
       ''');
     }
     final subjectsData = await dbHelper.queryAllSubjects();
@@ -259,11 +260,25 @@ class _SummaryPageState extends State<SummaryPage> with TickerProviderStateMixin
                                 ),
                                 title: Text(
                                   subject.name,
-                                  style: const TextStyle(fontWeight: FontWeight.bold),
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    color: Theme.of(context).colorScheme.onSurface,
+                                  ),
                                 ),
-                                subtitle: Text(
-                                  "$sessions sessions • ${formatDuration(hours)}",
-                                  style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant),
+                                subtitle: RichText(
+                                  text: TextSpan(
+                                    text: "$sessions sessions • ",
+                                    style: TextStyle(color: _chartColors[index % _chartColors.length]),
+                                    children: [
+                                      TextSpan(
+                                        text: formatDuration(hours),
+                                        style: TextStyle(
+                                          color: _chartColors[index % _chartColors.length],
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
                                 ),
                               ),
                             );

@@ -27,6 +27,7 @@ class SubjectProvider with ChangeNotifier {
   }
 
   Future<void> deleteSubject(int id) async {
+    await _dbHelper.deleteStudyRecordsBySubject(id);
     await _dbHelper.deleteSubject(id);
     await loadSubjects();
   }
