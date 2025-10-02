@@ -144,33 +144,81 @@ class _SummaryPageState extends State<SummaryPage> with TickerProviderStateMixin
                             color: Theme.of(context).colorScheme.surface,
                             child: Padding(
                               padding: const EdgeInsets.all(16),
-                              child: PieChart(
-                                PieChartData(
-                                  sectionsSpace: 4,
-                                  centerSpaceRadius: 40,
-                                  borderData: FlBorderData(show: false),
-                                  sections: _summary.asMap().entries.map((entry) {
-                                    final index = entry.key;
-                                    final item = entry.value;
-                                    final hours = item['total_duration'] / 60.0;
-                                    final subject = _subjects.firstWhere(
-                                      (s) => s.id == item['subject_id'],
-                                      orElse: () => Subject(id: 0, name: 'Deleted'),
-                                    );
-                                    return PieChartSectionData(
-                                      value: hours,
-                          title: subject.name,
-                                      color: _chartColors[index % _chartColors.length],
-                                      radius: 60,
-                                      titleStyle: const TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 12,
-                                        color: Colors.black,
+                              child: _summary.length <= 5
+                                  ? PieChart(
+                                      PieChartData(
+                                        sectionsSpace: 4,
+                                        centerSpaceRadius: 40,
+                                        borderData: FlBorderData(show: false),
+                                        sections: _summary.asMap().entries.map((entry) {
+                                          final index = entry.key;
+                                          final item = entry.value;
+                                          final hours = item['total_duration'] / 60.0;
+                                          final subject = _subjects.firstWhere(
+                                            (s) => s.id == item['subject_id'],
+                                            orElse: () => Subject(id: 0, name: 'Deleted'),
+                                          );
+                                          return PieChartSectionData(
+                                            value: hours,
+                                            title: subject.name,
+                                            color: _chartColors[index % _chartColors.length],
+                                            radius: 60,
+                                            titleStyle: const TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 12,
+                                              color: Colors.black,
+                                            ),
+                                          );
+                                        }).toList(),
                                       ),
-                                    );
-                                  }).toList(),
-                                ),
-                              ),
+                                    )
+                                  : BarChart(
+                                      BarChartData(
+                                        barGroups: _summary.asMap().entries.map((entry) {
+                                          final index = entry.key;
+                                          final item = entry.value;
+                                          final hours = item['total_duration'] / 60.0;
+                                          return BarChartGroupData(
+                                            x: index,
+                                            barRods: [
+                                              BarChartRodData(
+                                                toY: hours,
+                                                color: _chartColors[index % _chartColors.length],
+                                                width: 20,
+                                              ),
+                                            ],
+                                          );
+                                        }).toList(),
+                                        titlesData: FlTitlesData(
+                                          bottomTitles: AxisTitles(
+                                            sideTitles: SideTitles(
+                                              showTitles: true,
+                                              getTitlesWidget: (value, meta) {
+                                                final index = value.toInt();
+                                                if (index >= 0 && index < _summary.length) {
+                                                  final subject = _subjects.firstWhere(
+                                                    (s) => s.id == _summary[index]['subject_id'],
+                                                    orElse: () => Subject(id: 0, name: 'Deleted'),
+                                                  );
+                                                  return Text(
+                                                    subject.name,
+                                                    style: const TextStyle(fontSize: 10),
+                                                  );
+                                                }
+                                                return const Text('');
+                                              },
+                                            ),
+                                          ),
+                                          leftTitles: AxisTitles(
+                                            sideTitles: SideTitles(showTitles: true),
+                                          ),
+                                          topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                                          rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                                        ),
+                                        borderData: FlBorderData(show: false),
+                                        gridData: FlGridData(show: true),
+                                      ),
+                                    ),
                             ),
                           ),
                         ),
