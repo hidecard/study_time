@@ -16,6 +16,17 @@ class _SummaryPageState extends State<SummaryPage> with TickerProviderStateMixin
   String _period = 'week';
   late TabController _tabController;
 
+  String formatDuration(double hours) {
+    int totalMinutes = (hours * 60).round();
+    int fullHours = totalMinutes ~/ 60;
+    int minutes = totalMinutes % 60;
+    if (minutes == 0) {
+      return '$fullHours hour${fullHours != 1 ? 's' : ''}';
+    } else {
+      return '$fullHours hour${fullHours != 1 ? 's' : ''} $minutes Minuts';
+    }
+  }
+
   final List<Color> _chartColors = [
     Colors.blueAccent,
     Colors.pinkAccent,
@@ -130,7 +141,7 @@ class _SummaryPageState extends State<SummaryPage> with TickerProviderStateMixin
                               );
                               return PieChartSectionData(
                                 value: hours,
-                                title: "${hours.toStringAsFixed(1)}h",
+                                title: "${subject.name}\n${formatDuration(hours)}",
                                 color: _chartColors[index % _chartColors.length],
                                 radius: 60,
                                 titleStyle: const TextStyle(
@@ -185,7 +196,7 @@ class _SummaryPageState extends State<SummaryPage> with TickerProviderStateMixin
                             style: const TextStyle(fontWeight: FontWeight.bold),
                           ),
                           subtitle: Text(
-                            "$sessions sessions • ${hours.toStringAsFixed(1)} hours",
+                            "$sessions sessions • ${formatDuration(hours)}",
                             style: const TextStyle(color: Colors.black54),
                           ),
                         ),

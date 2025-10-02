@@ -15,6 +15,17 @@ class HistoryPage extends StatefulWidget {
 }
 
 class _HistoryPageState extends State<HistoryPage> {
+  String formatDuration(double hours) {
+    int totalMinutes = (hours * 60).round();
+    int fullHours = totalMinutes ~/ 60;
+    int minutes = totalMinutes % 60;
+    if (minutes == 0) {
+      return '$fullHours hour${fullHours != 1 ? 's' : ''}';
+    } else {
+      return '$fullHours hour${fullHours != 1 ? 's' : ''} $minutes Minuts';
+    }
+  }
+
   @override
   void initState() {
     super.initState();
@@ -73,7 +84,7 @@ class _HistoryPageState extends State<HistoryPage> {
                     ),
                     subtitle: Text(
                       '${DateFormat('HH:mm').format(start)} - ${DateFormat('HH:mm').format(end)}\n'
-                      '⏱ ${durationHours.toStringAsFixed(1)} hrs\n'
+                      '⏱ ${formatDuration(durationHours)}\n'
                       '${record.description ?? ''}',
                     ),
                     trailing: IconButton(
@@ -145,7 +156,7 @@ class _HistoryPageState extends State<HistoryPage> {
                           startTime = DateTime(picked.year, picked.month, picked.day, time.hour, time.minute);
                           if (startTime != null && endTime != null) {
                             final duration = endTime!.difference(startTime!).inMinutes;
-                            durationController.text = '$duration minutes';
+                            durationController.text = formatDuration(duration / 60.0);
                           }
                         });
                       }
@@ -177,7 +188,7 @@ class _HistoryPageState extends State<HistoryPage> {
                           endTime = DateTime(picked.year, picked.month, picked.day, time.hour, time.minute);
                           if (startTime != null && endTime != null) {
                             final duration = endTime!.difference(startTime!).inMinutes;
-                            durationController.text = '$duration minutes';
+                            durationController.text = formatDuration(duration / 60.0);
                           }
                         });
                       }
