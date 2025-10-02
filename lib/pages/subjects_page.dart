@@ -134,13 +134,13 @@ class _SubjectsPageState extends State<SubjectsPage> {
                                 ),
                               ),
                               IconButton(
-                                icon: const Icon(Icons.edit,
+                                icon: const Icon(Icons.edit, size: 24,
                                     color: Colors.black54),
                                 onPressed: () =>
                                     _showSubjectDialog(subject: subject),
                               ),
                               IconButton(
-                                icon: const Icon(Icons.delete,
+                                icon: const Icon(Icons.delete, size: 24,
                                     color: Colors.red),
                                 onPressed: () =>
                                     _deleteSubject(subject.id!),

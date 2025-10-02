@@ -76,7 +76,7 @@ class _HistoryPageState extends State<HistoryPage> {
                       '${record.description ?? ''}',
                     ),
                     trailing: IconButton(
-                      icon: const Icon(Icons.delete, color: Colors.redAccent),
+                      icon: const Icon(Icons.delete, size: 24, color: Colors.redAccent),
                       onPressed: () => _deleteRecord(record.id!),
                     ),
                   ),
@@ -125,7 +125,7 @@ class _HistoryPageState extends State<HistoryPage> {
                   title: Text(startTime == null
                       ? 'Select Start Time'
                       : DateFormat('yyyy-MM-dd HH:mm').format(startTime!)),
-                  trailing: const Icon(Icons.calendar_today, color: Colors.blueAccent),
+                  trailing: const Icon(Icons.calendar_today, size: 24, color: Colors.blueAccent),
                   onTap: () async {
                     final picked = await showDatePicker(
                       context: context,
@@ -157,7 +157,7 @@ class _HistoryPageState extends State<HistoryPage> {
                   title: Text(endTime == null
                       ? 'Select End Time'
                       : DateFormat('yyyy-MM-dd HH:mm').format(endTime!)),
-                  trailing: const Icon(Icons.calendar_today, color: Colors.blueAccent),
+                  trailing: const Icon(Icons.calendar_today, size: 24, color: Colors.blueAccent),
                   onTap: () async {
                     final picked = await showDatePicker(
                       context: context,
@@ -231,7 +231,7 @@ class _HistoryPageState extends State<HistoryPage> {
                         );
                       }
                     },
-                    icon: const Icon(Icons.save),
+                    icon: const Icon(Icons.save, size: 20),
                     label: const Text("Save"),
                   ),
                 ),
