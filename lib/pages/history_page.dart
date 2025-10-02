@@ -32,9 +32,10 @@ class _HistoryPageState extends State<HistoryPage> {
       appBar: AppBar(
         title: Text(
           '${widget.subject.name} History',
-          style: const TextStyle(fontWeight: FontWeight.bold),
+          style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
         ),
         backgroundColor: Colors.blueAccent,
+        iconTheme: const IconThemeData(color: Colors.white),
         elevation: 4,
       ),
       body: records.isEmpty
@@ -84,7 +85,8 @@ class _HistoryPageState extends State<HistoryPage> {
               },
             ),
       floatingActionButton: FloatingActionButton.extended(
-        backgroundColor: Colors.blueAccent,
+        backgroundColor: const Color(0xFF3B6BFF),
+        foregroundColor: Colors.white,
         onPressed: () => _showAddRecordSheet(),
         icon: const Icon(Icons.add),
         label: const Text("Add Record"),
@@ -208,7 +210,8 @@ class _HistoryPageState extends State<HistoryPage> {
                   alignment: Alignment.centerRight,
                   child: ElevatedButton.icon(
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.blueAccent,
+                      backgroundColor: const Color(0xFF3B6BFF),
+                      foregroundColor: Colors.white,
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                     ),
                     onPressed: () async {

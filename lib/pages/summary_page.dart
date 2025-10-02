@@ -79,6 +79,8 @@ class _SummaryPageState extends State<SummaryPage> with TickerProviderStateMixin
         bottom: TabBar(
           controller: _tabController,
           indicatorColor: Colors.white,
+          labelColor: Colors.white,
+          unselectedLabelColor: Colors.white70,
           labelStyle: const TextStyle(fontWeight: FontWeight.bold),
           tabs: const [
             Tab(text: 'Weekly'),
