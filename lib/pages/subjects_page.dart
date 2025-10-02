@@ -78,14 +78,7 @@ class _SubjectsPageState extends State<SubjectsPage> {
                     itemCount: subjects.length,
                     itemBuilder: (context, index) {
                       final subject = subjects[index];
-                      final colors = [
-                        Colors.blue.shade100,
-                        Colors.pink.shade100,
-                        Colors.green.shade100,
-                        Colors.orange.shade100,
-                        Colors.purple.shade100,
-                      ];
-                      final color = colors[index % colors.length];
+                      final color = Theme.of(context).colorScheme.surfaceVariant;
 
                       return GestureDetector(
                         onTap: () {
@@ -116,28 +109,28 @@ class _SubjectsPageState extends State<SubjectsPage> {
                               CircleAvatar(
                                 backgroundColor: Theme.of(context).colorScheme.primary,
                                 child: Icon(Icons.book,
-                                    color: Colors.white),
+                                    color: Theme.of(context).colorScheme.onPrimary),
                               ),
                               const SizedBox(width: 14),
                               Expanded(
                                 child: Text(
                                   subject.name,
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                     fontSize: 18,
                                     fontWeight: FontWeight.w600,
-                                    color: Colors.black,
+                                    color: Theme.of(context).colorScheme.onSurface,
                                   ),
                                 ),
                               ),
                               IconButton(
                                 icon: Icon(Icons.edit, size: 24,
-                                    color: Colors.black),
+                                    color: Theme.of(context).colorScheme.onSurface),
                                 onPressed: () =>
                                     _showSubjectDialog(subject: subject),
                               ),
                               IconButton(
                                 icon: Icon(Icons.delete, size: 24,
-                                    color: Colors.red),
+                                    color: Theme.of(context).colorScheme.error),
                                 onPressed: () =>
                                     _deleteSubject(subject.id!),
                               ),
@@ -154,8 +147,8 @@ class _SubjectsPageState extends State<SubjectsPage> {
       // 🔹 Floating Add Button
       floatingActionButton: FloatingActionButton(
         onPressed: () => _showSubjectDialog(),
-        backgroundColor: const Color(0xFF87CEEB),
-        foregroundColor: Colors.white,
+        backgroundColor: Theme.of(context).colorScheme.primary,
+        foregroundColor: Theme.of(context).colorScheme.onPrimary,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(18),
         ),
@@ -166,20 +159,36 @@ class _SubjectsPageState extends State<SubjectsPage> {
 
   void _showSubjectDialog({Subject? subject}) {
     final isEditing = subject != null;
-    final controller =
+    final nameController =
         TextEditingController(text: isEditing ? subject.name : '');
+    final goalController = TextEditingController(
+        text: isEditing ? (subject.weeklyGoalMinutes / 60).toStringAsFixed(1) : '0');
 
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         title: Text(isEditing ? 'Edit Subject' : 'Add Subject'),
-        content: TextField(
-          controller: controller,
-          decoration: const InputDecoration(
-            labelText: 'Subject Name',
-            border: OutlineInputBorder(),
-          ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: nameController,
+              decoration: const InputDecoration(
+                labelText: 'Subject Name',
+                border: OutlineInputBorder(),
+              ),
+            ),
+            const SizedBox(height: 16),
+            TextField(
+              controller: goalController,
+              keyboardType: TextInputType.number,
+              decoration: const InputDecoration(
+                labelText: 'Weekly Goal (hours)',
+                border: OutlineInputBorder(),
+              ),
+            ),
+          ],
         ),
         actions: [
           TextButton(
@@ -195,16 +204,17 @@ class _SubjectsPageState extends State<SubjectsPage> {
               ),
             ),
             onPressed: () async {
-              final name = controller.text.trim();
+              final name = nameController.text.trim();
+              final goalMinutes = int.tryParse(goalController.text) ?? 0;
               if (name.isNotEmpty) {
                 if (isEditing) {
                   final updatedSubject =
-                      Subject(id: subject!.id, name: name);
+                      Subject(id: subject!.id, name: name, weeklyGoalMinutes: goalMinutes);
                   await context
                       .read<SubjectProvider>()
                       .updateSubject(updatedSubject);
                 } else {
-                  final newSubject = Subject(name: name);
+                  final newSubject = Subject(name: name, weeklyGoalMinutes: goalMinutes);
                   await context.read<SubjectProvider>().addSubject(newSubject);
                 }
                 Navigator.pop(context);

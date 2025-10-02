@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
+import 'package:provider/provider.dart';
 import '../database_helper.dart';
 import '../models/subject.dart';
+import '../models/goal.dart';
+import '../providers/goal_provider.dart';
 
 class SummaryPage extends StatefulWidget {
   const SummaryPage({super.key});
@@ -35,6 +38,9 @@ class _SummaryPageState extends State<SummaryPage> with TickerProviderStateMixin
     Colors.purple.shade700,
   ];
 
+  Goal? _goal;
+  double _progressPercent = 0.0;
+
   @override
   void initState() {
     super.initState();
@@ -44,8 +50,30 @@ class _SummaryPageState extends State<SummaryPage> with TickerProviderStateMixin
         _period = ['week', 'month', 'year'][_tabController.index];
       });
       _loadSummary();
+      _loadGoal();
     });
     _loadSummary();
+    _loadGoal();
+  }
+
+  Future<void> _loadGoal() async {
+    final goalProvider = Provider.of<GoalProvider>(context, listen: false);
+    await goalProvider.loadGoal(_period);
+    setState(() {
+      _goal = goalProvider.goal;
+      _progressPercent = 0.0;
+      if (_goal != null && _summary.isNotEmpty) {
+        int totalDuration = 0;
+        if (_period == 'week') {
+          totalDuration = _summary.fold<int>(0, (sum, item) => sum + ((item['total_duration'] as int?) ?? 0));
+        } else if (_period == 'month') {
+          totalDuration = _summary.fold<int>(0, (sum, item) => sum + ((item['total_duration'] as int?) ?? 0));
+        } else if (_period == 'year') {
+          totalDuration = _summary.fold<int>(0, (sum, item) => sum + ((item['total_duration'] as int?) ?? 0));
+        }
+        _progressPercent = (totalDuration / _goal!.targetMinutes).clamp(0.0, 1.0);
+      }
+    });
   }
 
   @override
@@ -78,6 +106,39 @@ class _SummaryPageState extends State<SummaryPage> with TickerProviderStateMixin
     });
   }
 
+  void _setGoal() {
+    final controller = TextEditingController(text: _goal?.targetMinutes.toString() ?? '');
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Set $_period Goal (minutes)'),
+        content: TextField(
+          controller: controller,
+          keyboardType: TextInputType.number,
+          decoration: const InputDecoration(labelText: 'Target minutes'),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              final minutes = int.tryParse(controller.text);
+              if (minutes != null && minutes > 0) {
+                final goal = Goal(targetMinutes: minutes, period: _period);
+                await Provider.of<GoalProvider>(context, listen: false).setGoal(goal);
+                Navigator.pop(context);
+                _loadGoal();
+              }
+            },
+            child: const Text('Set'),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -91,13 +152,18 @@ class _SummaryPageState extends State<SummaryPage> with TickerProviderStateMixin
             decoration: const BoxDecoration(
               color: Color(0xFF87CEEB), // sky blue
             ),
-            child: const Text(
-              "Study Summary",
-              style: TextStyle(
-                fontSize: 26,
-                fontWeight: FontWeight.bold,
-                color: Colors.white,
-              ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text(
+                  "Study Summary",
+                  style: TextStyle(
+                    fontSize: 26,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
+              ],
             ),
           ),
           // Tab Bar
@@ -116,6 +182,7 @@ class _SummaryPageState extends State<SummaryPage> with TickerProviderStateMixin
               ],
             ),
           ),
+
           // Body
           Expanded(
             child: _summary.isEmpty
@@ -265,20 +332,46 @@ class _SummaryPageState extends State<SummaryPage> with TickerProviderStateMixin
                                     color: Theme.of(context).colorScheme.onSurface,
                                   ),
                                 ),
-                                subtitle: RichText(
-                                  text: TextSpan(
-                                    text: "$sessions sessions • ",
-                                    style: TextStyle(color: _chartColors[index % _chartColors.length]),
-                                    children: [
-                                      TextSpan(
-                                        text: formatDuration(hours),
-                                        style: TextStyle(
-                                          color: _chartColors[index % _chartColors.length],
-                                          fontWeight: FontWeight.bold,
-                                        ),
+                                subtitle: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    RichText(
+                                      text: TextSpan(
+                                        text: "$sessions sessions • ",
+                                        style: TextStyle(color: _chartColors[index % _chartColors.length]),
+                                        children: [
+                                          TextSpan(
+                                            text: formatDuration(hours),
+                                            style: TextStyle(
+                                              color: _chartColors[index % _chartColors.length],
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                        ],
                                       ),
-                                    ],
-                                  ),
+                                    ),
+                                    if (_period == 'week' && subject.weeklyGoalMinutes > 0)
+                                      Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          const SizedBox(height: 4),
+                                          LinearProgressIndicator(
+                                            value: (item['total_duration'] / subject.weeklyGoalMinutes).clamp(0.0, 1.0),
+                                            backgroundColor: Theme.of(context).colorScheme.surfaceVariant,
+                                            color: _chartColors[index % _chartColors.length],
+                                            minHeight: 4,
+                                          ),
+                                          const SizedBox(height: 2),
+                                          Text(
+                                            'Goal: ${(subject.weeklyGoalMinutes / 60).toStringAsFixed(1)} hours - ${(100 * (item['total_duration'] / subject.weeklyGoalMinutes).clamp(0.0, 1.0)).toStringAsFixed(1)}%',
+                                            style: TextStyle(
+                                              fontSize: 12,
+                                              color: Theme.of(context).colorScheme.onSurfaceVariant,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                  ],
                                 ),
                               ),
                             );

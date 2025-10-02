@@ -1,5 +1,12 @@
-    - [x] Update main.dart: Make bottomNavigationBar use theme colors instead of hardcoded white and specific colors.
-- [x] Update subjects_page.dart: Remove hardcoded scaffold backgroundColor, update text colors, card colors, and dialog colors to be theme-aware.
-- [x] Update summary_page.dart: Update AppBar, TabBar, Card, and text colors to use theme properties.
-- [ ] Update history_page.dart: Update AppBar, FloatingActionButton, and bottom sheet colors to use theme.
-- [ ] Test the app in both light and dark modes to ensure proper theming.
+- [ ] Update database_helper.dart to add weekly_goal_minutes column to subjects table
+- [ ] Update lib/models/subject.dart to add weeklyGoalMinutes field
+- [ ] Update lib/providers/subject_provider.dart to support weekly goals
+- [ ] Update lib/pages/subjects_page.dart to allow setting weekly goal per subject
+- [ ] Update lib/pages/summary_page.dart to show progress bar per subject based on weekly goal
+- [ ] Remove flutter_local_notifications dependency from pubspec.yaml
+- [ ] Remove reminders table from database_helper.dart
+- [ ] Remove lib/models/notification_reminder.dart
+- [ ] Remove lib/providers/notification_provider.dart
+- [ ] Remove notification initialization from lib/main.dart
+- [ ] Remove notification UI from lib/pages/summary_page.dart
+- [ ] Test the weekly goal feature and global goals

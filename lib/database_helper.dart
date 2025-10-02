@@ -22,8 +22,9 @@ class DatabaseHelper {
     String path = join(documentsDirectory.path, 'study_time.db');
     return await openDatabase(
       path,
-      version: 1,
+      version: 2,
       onCreate: _onCreate,
+      onUpgrade: _onUpgrade,
     );
   }
 
@@ -31,7 +32,8 @@ class DatabaseHelper {
     await db.execute('''
       CREATE TABLE subjects (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        name TEXT NOT NULL
+        name TEXT NOT NULL,
+        weekly_goal_minutes INTEGER DEFAULT 0
       )
     ''');
 
@@ -46,6 +48,22 @@ class DatabaseHelper {
         FOREIGN KEY(subject_id) REFERENCES subjects(id)
       )
     ''');
+
+    await db.execute('''
+      CREATE TABLE goals (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        target_minutes INTEGER NOT NULL,
+        period TEXT NOT NULL
+      )
+    ''');
+
+
+  }
+
+  Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
+    if (oldVersion < 2) {
+      await db.execute('ALTER TABLE subjects ADD COLUMN weekly_goal_minutes INTEGER DEFAULT 0');
+    }
   }
 
   // Subjects CRUD
@@ -115,4 +133,27 @@ class DatabaseHelper {
     Database db = await database;
     return await db.rawQuery(sql);
   }
+
+  // Goals CRUD
+  Future<int> insertGoal(Map<String, dynamic> row) async {
+    Database db = await database;
+    return await db.insert('goals', row);
+  }
+
+  Future<List<Map<String, dynamic>>> queryGoalByPeriod(String period) async {
+    Database db = await database;
+    return await db.query('goals', where: 'period = ?', whereArgs: [period]);
+  }
+
+  Future<int> updateGoal(int id, Map<String, dynamic> row) async {
+    Database db = await database;
+    return await db.update('goals', row, where: 'id = ?', whereArgs: [id]);
+  }
+
+  Future<int> deleteGoal(int id) async {
+    Database db = await database;
+    return await db.delete('goals', where: 'id = ?', whereArgs: [id]);
+  }
+
+
 }

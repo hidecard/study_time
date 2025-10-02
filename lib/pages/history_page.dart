@@ -43,18 +43,18 @@ class _HistoryPageState extends State<HistoryPage> {
       appBar: AppBar(
         title: Text(
           '${widget.subject.name} History',
-          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+          style: TextStyle(fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onPrimary),
         ),
-        backgroundColor: const Color(0xFF87CEEB), // sky blue
+        backgroundColor: Theme.of(context).colorScheme.primary,
         iconTheme: IconThemeData(color: Theme.of(context).colorScheme.onPrimary),
         elevation: 4,
       ),
       body: records.isEmpty
-          ? const Center(
+          ? Center(
               child: Text(
                 'No study records yet.\nTap + to add one!',
                 textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 16, color: Colors.grey),
+                style: TextStyle(fontSize: 16, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6)),
               ),
             )
           : ListView.builder(
@@ -104,7 +104,7 @@ class _HistoryPageState extends State<HistoryPage> {
                       ),
                     ),
                     trailing: IconButton(
-                      icon: const Icon(Icons.delete, size: 24, color: Colors.redAccent),
+                      icon: Icon(Icons.delete, size: 24, color: Theme.of(context).colorScheme.error),
                       onPressed: () => _deleteRecord(record.id!),
                     ),
                   ),

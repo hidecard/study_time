@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'providers/subject_provider.dart';
 import 'providers/study_record_provider.dart';
+import 'providers/goal_provider.dart';
 import 'pages/subjects_page.dart';
 import 'pages/summary_page.dart';
 
@@ -18,6 +19,7 @@ class MyApp extends StatelessWidget {
       providers: [
         ChangeNotifierProvider(create: (_) => SubjectProvider()),
         ChangeNotifierProvider(create: (_) => StudyRecordProvider()),
+        ChangeNotifierProvider(create: (_) => GoalProvider()),
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
