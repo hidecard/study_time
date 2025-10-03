@@ -160,15 +160,15 @@ class _CalendarPageState extends State<CalendarPage> {
             },
             calendarStyle: CalendarStyle(
               selectedDecoration: BoxDecoration(
-                color: Colors.deepPurpleAccent,
+                color: Colors.orangeAccent,
                 shape: BoxShape.circle,
               ),
               todayDecoration: BoxDecoration(
-                color: Colors.pinkAccent,
+                color: Colors.greenAccent,
                 shape: BoxShape.circle,
               ),
               markerDecoration: BoxDecoration(
-                color: Colors.tealAccent,
+                color: Colors.blueAccent,
                 shape: BoxShape.circle,
                 borderRadius: BorderRadius.circular(6),
               ),
@@ -181,7 +181,7 @@ class _CalendarPageState extends State<CalendarPage> {
                     width: 14,
                     height: 14,
                     decoration: BoxDecoration(
-                      color: Colors.tealAccent,
+                      color: Colors.blueAccent,
                       shape: BoxShape.circle,
                     ),
                   );

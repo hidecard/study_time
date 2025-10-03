@@ -21,7 +21,7 @@ class _SubjectsPageState extends State<SubjectsPage> {
     [Colors.teal.shade400, Colors.cyan.shade400],
     [const Color.fromARGB(255, 130, 119, 17), const Color.fromARGB(255, 171, 139, 31)],
     [Colors.indigo.shade400, Colors.lightBlue.shade400],
-  ];ix
+  ];
 
   @override
   void initState() {
