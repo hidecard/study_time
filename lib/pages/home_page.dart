@@ -5,6 +5,7 @@ import '../database_helper.dart';
 import '../models/subject.dart';
 import '../providers/subject_provider.dart';
 import '../providers/user_preferences_provider.dart';
+import '../providers/timetable_provider.dart';
 
 class DashboardPage extends StatefulWidget {
   const DashboardPage({super.key});
@@ -17,6 +18,7 @@ class _DashboardPageState extends State<DashboardPage> {
   double _todayStudied = 0.0;
   double _weeklyTotal = 0.0;
   double _weeklyGoal = 0.0;
+  double _plannedWeeklyHours = 0.0;
   int _currentStreak = 0;
   String _nextReminder = 'No reminder set';
 
@@ -59,6 +61,11 @@ class _DashboardPageState extends State<DashboardPage> {
     // Weekly goal: sum of all subject weekly goals
     final subjects = context.read<SubjectProvider>().subjects;
     _weeklyGoal = subjects.fold<double>(0.0, (sum, subject) => sum + subject.weeklyGoalMinutes / 60.0);
+
+    // Planned weekly hours from timetable
+    final timetableProvider = context.read<TimetableProvider>();
+    await timetableProvider.loadTimetable();
+    _plannedWeeklyHours = timetableProvider.getPlannedHoursForWeek();
 
     // Calculate current streak
     final streakData = await dbHelper.rawQuery('''
@@ -212,7 +219,87 @@ class _DashboardPageState extends State<DashboardPage> {
                             ),
                           ],
                         ),
-                        const SizedBox(height: 32),
+                        const SizedBox(height: 24),
+                        // 🔹 Planned vs Actual Hours
+                        Container(
+                          padding: const EdgeInsets.all(16),
+                          decoration: BoxDecoration(
+                            color: Theme.of(context).colorScheme.surface,
+                            borderRadius: BorderRadius.circular(12),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Theme.of(context).colorScheme.shadow.withOpacity(0.1),
+                                blurRadius: 8,
+                                offset: const Offset(0, 2),
+                              ),
+                            ],
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Planned vs Actual Hours',
+                                style: GoogleFonts.poppins(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              const SizedBox(height: 16),
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: _buildComparisonCard(
+                                      'Planned',
+                                      '${_plannedWeeklyHours.toStringAsFixed(1)}h',
+                                      Icons.schedule,
+                                      Colors.blue,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 12),
+                                  Expanded(
+                                    child: _buildComparisonCard(
+                                      'Actual',
+                                      '${_weeklyTotal.toStringAsFixed(1)}h',
+                                      Icons.access_time,
+                                      Colors.green,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 16),
+                              // Progress bar showing completion
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'Weekly Progress',
+                                    style: GoogleFonts.poppins(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 8),
+                                  LinearProgressIndicator(
+                                    value: _plannedWeeklyHours > 0 ? (_weeklyTotal / _plannedWeeklyHours).clamp(0.0, 1.0) : 0.0,
+                                    backgroundColor: Colors.grey.withOpacity(0.3),
+                                    valueColor: AlwaysStoppedAnimation<Color>(
+                                      _weeklyTotal >= _plannedWeeklyHours ? Colors.green : Colors.orange,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    '${((_weeklyTotal / _plannedWeeklyHours) * 100).toStringAsFixed(1)}% of planned hours completed',
+                                    style: GoogleFonts.poppins(
+                                      fontSize: 12,
+                                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 24),
                         if (userPrefs.achievements.isNotEmpty)
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -270,6 +357,38 @@ class _DashboardPageState extends State<DashboardPage> {
             title,
             style: GoogleFonts.poppins(
               fontSize: 12,
+              color: color.withOpacity(0.7),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildComparisonCard(String title, String value, IconData icon, Color color) {
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: color.withOpacity(0.3)),
+      ),
+      child: Column(
+        children: [
+          Icon(icon, color: color, size: 24),
+          const SizedBox(height: 4),
+          Text(
+            value,
+            style: GoogleFonts.poppins(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+              color: color,
+            ),
+          ),
+          Text(
+            title,
+            style: GoogleFonts.poppins(
+              fontSize: 10,
               color: color.withOpacity(0.7),
             ),
           ),

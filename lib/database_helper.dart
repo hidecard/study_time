@@ -13,8 +13,16 @@ class DatabaseHelper {
 
   Future<Database> get database async {
     if (_database != null) return _database!;
+    // Force fresh database creation to ensure schema is up to date
+    await deleteDatabaseFile();
     _database = await _initDatabase();
     return _database!;
+  }
+
+  Future<void> deleteDatabaseFile() async {
+    Directory documentsDirectory = await getApplicationDocumentsDirectory();
+    String path = join(documentsDirectory.path, 'study_time.db');
+    await deleteDatabase(path);
   }
 
   Future<Database> _initDatabase() async {
@@ -22,7 +30,7 @@ class DatabaseHelper {
     String path = join(documentsDirectory.path, 'study_time.db');
     return await openDatabase(
       path,
-      version: 3,
+      version: 4,
       onCreate: _onCreate,
       onUpgrade: _onUpgrade,
     );
@@ -68,6 +76,29 @@ class DatabaseHelper {
       )
     ''');
 
+    await db.execute('''
+      CREATE TABLE timetable_slots (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        day_of_week INTEGER NOT NULL,
+        start_time TEXT NOT NULL,
+        end_time TEXT NOT NULL,
+        subject_id INTEGER,
+        FOREIGN KEY(subject_id) REFERENCES subjects(id)
+      )
+    ''');
+
+    await db.execute('''
+      CREATE TABLE exam_assignments (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        subject_id INTEGER NOT NULL,
+        title TEXT NOT NULL,
+        date TEXT NOT NULL,
+        type TEXT NOT NULL,
+        description TEXT,
+        FOREIGN KEY(subject_id) REFERENCES subjects(id)
+      )
+    ''');
+
   }
 
   Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
@@ -76,6 +107,19 @@ class DatabaseHelper {
     }
     if (oldVersion < 3) {
       await db.execute('ALTER TABLE subjects ADD COLUMN category TEXT');
+    }
+    if (oldVersion < 4) {
+      await db.execute('''
+        CREATE TABLE exam_assignments (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          subject_id INTEGER NOT NULL,
+          title TEXT NOT NULL,
+          date TEXT NOT NULL,
+          type TEXT NOT NULL,
+          description TEXT,
+          FOREIGN KEY(subject_id) REFERENCES subjects(id)
+        )
+      ''');
     }
   }
 
@@ -202,5 +246,47 @@ class DatabaseHelper {
   Future<int> rawDelete(String sql, [List<dynamic>? arguments]) async {
     Database db = await database;
     return await db.rawDelete(sql, arguments ?? []);
+  }
+
+  // Timetable Slots CRUD
+  Future<int> insertTimetableSlot(Map<String, dynamic> row) async {
+    Database db = await database;
+    return await db.insert('timetable_slots', row);
+  }
+
+  Future<List<Map<String, dynamic>>> queryAllTimetableSlots() async {
+    Database db = await database;
+    return await db.query('timetable_slots', orderBy: 'day_of_week, start_time');
+  }
+
+  Future<int> updateTimetableSlot(int id, Map<String, dynamic> row) async {
+    Database db = await database;
+    return await db.update('timetable_slots', row, where: 'id = ?', whereArgs: [id]);
+  }
+
+  Future<int> deleteTimetableSlot(int id) async {
+    Database db = await database;
+    return await db.delete('timetable_slots', where: 'id = ?', whereArgs: [id]);
+  }
+
+  // Exam Assignments CRUD
+  Future<int> insertExamAssignment(Map<String, dynamic> row) async {
+    Database db = await database;
+    return await db.insert('exam_assignments', row);
+  }
+
+  Future<List<Map<String, dynamic>>> queryAllExamAssignments() async {
+    Database db = await database;
+    return await db.query('exam_assignments', orderBy: 'date');
+  }
+
+  Future<int> updateExamAssignment(int id, Map<String, dynamic> row) async {
+    Database db = await database;
+    return await db.update('exam_assignments', row, where: 'id = ?', whereArgs: [id]);
+  }
+
+  Future<int> deleteExamAssignment(int id) async {
+    Database db = await database;
+    return await db.delete('exam_assignments', where: 'id = ?', whereArgs: [id]);
   }
 }

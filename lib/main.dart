@@ -6,10 +6,13 @@ import 'providers/study_record_provider.dart';
 import 'providers/goal_provider.dart';
 import 'providers/user_preferences_provider.dart';
 import 'providers/notification_provider.dart';
+import 'providers/timetable_provider.dart';
+import 'providers/exam_assignment_provider.dart';
 import 'pages/home_page.dart' as dashboard;
 import 'pages/subjects_page.dart';
 import 'pages/summary_page.dart';
 import 'pages/calendar_page.dart';
+import 'pages/timetable_page.dart';
 
 void main() {
   runApp(const MyApp());
@@ -27,6 +30,8 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => GoalProvider()),
         ChangeNotifierProvider(create: (_) => UserPreferencesProvider()..loadPreferences()),
         ChangeNotifierProvider(create: (_) => NotificationProvider()),
+        ChangeNotifierProvider(create: (_) => TimetableProvider()),
+        ChangeNotifierProvider(create: (_) => ExamAssignmentProvider()),
       ],
       child: Consumer<UserPreferencesProvider>(
         builder: (context, userPrefs, child) {
@@ -58,6 +63,7 @@ class _HomePageState extends State<HomePage> {
     const SubjectsPage(),
     const SummaryPage(),
     const CalendarPage(),
+    const TimetablePage(),
   ];
 
   void _onItemTapped(int index) {

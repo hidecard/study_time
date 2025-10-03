@@ -1,10 +1,11 @@
-v   - [x] Add google_fonts dependency to pubspec.yaml
+- [x] Add google_fonts dependency to pubspec.yaml
 - [x] Update theme in main.dart for modern design
 - [x] Redesign subjects_page.dart with grid layout and animations
 - [x] Redesign summary_page.dart with enhanced charts and styling
 - [x] Redesign calendar_page.dart with better styling
 - [x] Run flutter pub get
 - [x] Test the app
+- [x] Add exam & assignment countdown per subject
 - [x] Implement achievements system (stored offline)
 - [x] Add offline daily quotes feature
 - [x] Create personalized dashboard with greeting and quote
@@ -12,8 +13,8 @@ v   - [x] Add google_fonts dependency to pubspec.yaml
 - [x] Add Pomodoro timer with auto-logging and notifications
 - [x] Implement reminder system with push notifications
 - [x] Add accessibility features (text scaling, voice over)
-- [ ] Add weekly/daily timetable with drag & drop subjects
-- [ ] Show "Planned vs Actual Hours" on dashboard
+- [x] Add weekly/daily timetable with drag & drop subjects
+- [x] Show "Planned vs Actual Hours" on dashboard
 - [ ] Add exam & assignment countdown per subject
 - [ ] Show exam/deadline countdown on dashboard
 - [ ] Implement offline notifications for scheduled study times
