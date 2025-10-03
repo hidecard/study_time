@@ -1,12 +1,7 @@
-- [ ] Update database_helper.dart to add weekly_goal_minutes column to subjects table
-- [ ] Update lib/models/subject.dart to add weeklyGoalMinutes field
-- [ ] Update lib/providers/subject_provider.dart to support weekly goals
-- [ ] Update lib/pages/subjects_page.dart to allow setting weekly goal per subject
-- [ ] Update lib/pages/summary_page.dart to show progress bar per subject based on weekly goal
-- [ ] Remove flutter_local_notifications dependency from pubspec.yaml
-- [ ] Remove reminders table from database_helper.dart
-- [ ] Remove lib/models/notification_reminder.dart
-- [ ] Remove lib/providers/notification_provider.dart
-- [ ] Remove notification initialization from lib/main.dart
-- [ ] Remove notification UI from lib/pages/summary_page.dart
-- [ ] Test the weekly goal feature and global goals
+- [x] Add google_fonts dependency to pubspec.yaml
+- [x] Update theme in main.dart for modern design
+- [x] Redesign subjects_page.dart with grid layout and animations
+- [x] Redesign summary_page.dart with enhanced charts and styling
+- [x] Redesign calendar_page.dart with better styling
+- [x] Run flutter pub get
+- [x] Test the app

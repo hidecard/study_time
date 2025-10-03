@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../models/subject.dart';
 import '../providers/subject_provider.dart';
 import 'history_page.dart';
@@ -12,12 +13,24 @@ class SubjectsPage extends StatefulWidget {
 }
 
 class _SubjectsPageState extends State<SubjectsPage> {
+  late List<Duration> _animationDelays;
+  final List<List<Color>> _cardGradients = [
+    [Colors.red.shade400, Colors.orange.shade400],
+    [Colors.blue.shade400, Colors.green.shade400],
+    [Colors.purple.shade400, Colors.pink.shade400],
+    [Colors.teal.shade400, Colors.cyan.shade400],
+    [const Color.fromARGB(255, 130, 119, 17), const Color.fromARGB(255, 171, 139, 31)],
+    [Colors.indigo.shade400, Colors.lightBlue.shade400],
+  ];ix
+
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<SubjectProvider>().loadSubjects();
     });
+    // Prepare animation delays for grid items
+    _animationDelays = List.generate(20, (index) => Duration(milliseconds: index * 100));
   }
 
   @override
@@ -29,125 +42,186 @@ class _SubjectsPageState extends State<SubjectsPage> {
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // 🔹 Gradient Header
+          // 🔹 Modern Header
           Container(
             padding: const EdgeInsets.fromLTRB(20, 60, 20, 30),
             width: double.infinity,
-          decoration: BoxDecoration(
-            color: const Color(0xFF9C27B0), // purple
-            borderRadius: BorderRadius.only(
-              bottomLeft: Radius.circular(28),
-              bottomRight: Radius.circular(28),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  Colors.deepPurpleAccent,
+                  Colors.pinkAccent,
+                ],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+              borderRadius: const BorderRadius.only(
+                bottomLeft: Radius.circular(28),
+                bottomRight: Radius.circular(28),
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: Theme.of(context).colorScheme.shadow.withOpacity(0.2),
+                  blurRadius: 10,
+                  offset: const Offset(0, 4),
+                ),
+              ],
             ),
-          ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              children: const [
+              children: [
                 Text(
                   "My Subjects",
-                  style: TextStyle(
-                    fontSize: 26,
+                  style: GoogleFonts.poppins(
+                    fontSize: 28,
                     fontWeight: FontWeight.bold,
                     color: Colors.white,
                   ),
                 ),
-                SizedBox(height: 6),
+                const SizedBox(height: 8),
                 Text(
                   "Keep track of your studies 📚",
-                  style: TextStyle(color: Colors.white70, fontSize: 14),
+                  style: GoogleFonts.poppins(
+                    color: Colors.white.withOpacity(0.8),
+                    fontSize: 16,
+                  ),
                 ),
               ],
             ),
           ),
 
-          // 🔹 Subject List / Empty State
+          // 🔹 Subject Grid / Empty State
           Expanded(
             child: subjects.isEmpty
                 ? Center(
-                    child: Text(
-                      "No subjects yet.\nTap + to add one!",
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                          fontSize: 16,
-                          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
-                          fontWeight: FontWeight.w500),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.book_outlined,
+                          size: 80,
+                          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.3),
+                        ),
+                        const SizedBox(height: 16),
+                        Text(
+                          "No subjects yet.\nTap + to add one!",
+                          textAlign: TextAlign.center,
+                          style: GoogleFonts.poppins(
+                            fontSize: 18,
+                            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ],
                     ),
                   )
-                : ListView.builder(
-                    padding: const EdgeInsets.all(16),
+                : GridView.builder(
+                    padding: const EdgeInsets.fromLTRB(16, 16, 16, 80),
+                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 2,
+                      crossAxisSpacing: 16,
+                      mainAxisSpacing: 16,
+                      childAspectRatio: 1.0,
+                    ),
                     itemCount: subjects.length,
                     itemBuilder: (context, index) {
                       final subject = subjects[index];
-                      final color = Theme.of(context).colorScheme.surfaceVariant;
+                      final delay = _animationDelays[index % _animationDelays.length];
 
-                      return GestureDetector(
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) =>
-                                  HistoryPage(subject: subject),
+                      return TweenAnimationBuilder<double>(
+                        tween: Tween(begin: 0.0, end: 1.0),
+                        duration: const Duration(milliseconds: 500),
+                        curve: Curves.easeOut,
+                        builder: (context, value, child) {
+                          return Transform.scale(
+                            scale: value,
+                            child: Opacity(
+                              opacity: value,
+                              child: child,
                             ),
                           );
                         },
-                        child: Container(
-                          margin: const EdgeInsets.only(bottom: 14),
-                          padding: const EdgeInsets.all(16),
-                          decoration: BoxDecoration(
-                            color: color,
-                            borderRadius: BorderRadius.circular(20),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withOpacity(0.05),
-                                blurRadius: 8,
-                                offset: const Offset(2, 4),
-                              )
-                            ],
-                          ),
-                          child: Row(
-                            children: [
-                              CircleAvatar(
-                                backgroundColor: Theme.of(context).colorScheme.primary,
-                                child: Icon(Icons.book,
-                                    color: Theme.of(context).colorScheme.onPrimary),
+                        child: GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => HistoryPage(subject: subject),
                               ),
-                              const SizedBox(width: 14),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      subject.name,
-                                      style: TextStyle(
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.w600,
-                                        color: Theme.of(context).colorScheme.onSurface,
-                                      ),
-                                    ),
-                                    if (subject.category != null && subject.category!.isNotEmpty)
-                                      Text(
-                                        subject.category!,
-                                        style: TextStyle(
-                                          fontSize: 14,
-                                          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+                            );
+                          },
+                          child: Card(
+                            elevation: 8,
+                            shadowColor: Theme.of(context).colorScheme.shadow.withOpacity(0.2),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            child: Container(
+                              padding: const EdgeInsets.all(16),
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                  colors: _cardGradients[index % _cardGradients.length],
+                                  begin: Alignment.topLeft,
+                                  end: Alignment.bottomRight,
+                                ),
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Column(
+                                    children: [
+                                      CircleAvatar(
+                                        radius: 20,
+                                        backgroundColor: Colors.white.withOpacity(0.2),
+                                        child: Icon(
+                                          Icons.book,
+                                          color: Colors.white,
+                                          size: 20,
                                         ),
                                       ),
-                                  ],
-                                ),
+                                      const SizedBox(height: 4),
+                                      Text(
+                                        subject.name,
+                                        style: GoogleFonts.poppins(
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.w600,
+                                          color: Colors.white,
+                                        ),
+                                        textAlign: TextAlign.center,
+                                        maxLines: 2,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                      if (subject.category != null && subject.category!.isNotEmpty)
+                                        Padding(
+                                          padding: const EdgeInsets.only(top: 1),
+                                          child: Text(
+                                            subject.category!,
+                                            style: GoogleFonts.poppins(
+                                              fontSize: 8,
+                                              color: Colors.white.withOpacity(0.8),
+                                            ),
+                                            textAlign: TextAlign.center,
+                                          ),
+                                        ),
+                                    ],
+                                  ),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                    children: [
+                                      IconButton(
+                                        icon: Icon(Icons.edit, size: 18, color: Colors.white),
+                                        onPressed: () => _showSubjectDialog(subject: subject),
+                                      ),
+                                      IconButton(
+                                        icon: Icon(Icons.delete, size: 18, color: Colors.white),
+                                        onPressed: () => _deleteSubject(subject.id!),
+                                      ),
+                                    ],
+                                  ),
+                                ],
                               ),
-                              IconButton(
-                                icon: Icon(Icons.edit, size: 24,
-                                    color: Theme.of(context).colorScheme.onSurface),
-                                onPressed: () =>
-                                    _showSubjectDialog(subject: subject),
-                              ),
-                              IconButton(
-                                icon: Icon(Icons.delete, size: 24,
-                                    color: Theme.of(context).colorScheme.error),
-                                onPressed: () =>
-                                    _deleteSubject(subject.id!),
-                              ),
-                            ],
+                            ),
                           ),
                         ),
                       );

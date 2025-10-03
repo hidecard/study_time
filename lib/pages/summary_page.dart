@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:provider/provider.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../database_helper.dart';
 import '../models/subject.dart';
 import '../models/goal.dart';
@@ -31,12 +32,15 @@ class _SummaryPageState extends State<SummaryPage> with TickerProviderStateMixin
     }
   }
 
-  final List<Color> _chartColors = [
-    Colors.blue.shade700,
-    Colors.pink.shade700,
-    Colors.green.shade700,
-    Colors.orange.shade700,
-    Colors.purple.shade700,
+  List<Color> get _chartColors => [
+    Colors.redAccent,
+    Colors.blueAccent,
+    Colors.greenAccent,
+    Colors.orangeAccent,
+    Colors.purpleAccent,
+    Colors.tealAccent,
+    Colors.pinkAccent,
+    Colors.yellowAccent,
   ];
 
   Goal? _goal;
@@ -159,22 +163,48 @@ class _SummaryPageState extends State<SummaryPage> with TickerProviderStateMixin
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Header like subjects page
+          // Modern Header
           Container(
             padding: const EdgeInsets.fromLTRB(20, 60, 20, 20),
             width: double.infinity,
-            decoration: const BoxDecoration(
-              color: Color(0xFF87CEEB), // sky blue
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  Colors.deepPurpleAccent,
+                  Colors.pinkAccent,
+                ],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+              borderRadius: const BorderRadius.only(
+                bottomLeft: Radius.circular(28),
+                bottomRight: Radius.circular(28),
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: Theme.of(context).colorScheme.shadow.withOpacity(0.2),
+                  blurRadius: 10,
+                  offset: const Offset(0, 4),
+                ),
+              ],
             ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
+                Text(
                   "Study Summary",
-                  style: TextStyle(
-                    fontSize: 26,
+                  style: GoogleFonts.poppins(
+                    fontSize: 28,
                     fontWeight: FontWeight.bold,
                     color: Colors.white,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  "Track your progress 📊",
+                  style: GoogleFonts.poppins(
+                    color: Colors.white.withOpacity(0.8),
+                    fontSize: 16,
                   ),
                 ),
               ],
@@ -182,13 +212,20 @@ class _SummaryPageState extends State<SummaryPage> with TickerProviderStateMixin
           ),
           // Tab Bar
           Container(
-            color: const Color(0xFF87CEEB), // sky blue
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+              borderRadius: const BorderRadius.only(
+                bottomLeft: Radius.circular(20),
+                bottomRight: Radius.circular(20),
+              ),
+            ),
             child: TabBar(
               controller: _tabController,
-              indicatorColor: Colors.white,
-              labelColor: Colors.white,
-              unselectedLabelColor: Colors.white.withOpacity(0.7),
-              labelStyle: const TextStyle(fontWeight: FontWeight.bold),
+              indicatorColor: Theme.of(context).colorScheme.primary,
+              labelColor: Theme.of(context).colorScheme.primary,
+              unselectedLabelColor: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+              labelStyle: GoogleFonts.poppins(fontWeight: FontWeight.bold),
+              unselectedLabelStyle: GoogleFonts.poppins(),
               tabs: const [
                 Tab(text: 'Weekly'),
                 Tab(text: 'Monthly'),
@@ -199,20 +236,40 @@ class _SummaryPageState extends State<SummaryPage> with TickerProviderStateMixin
           // Category Filter
           if (_categories.isNotEmpty)
             Container(
-              color: const Color(0xFF87CEEB),
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.surface,
+                borderRadius: const BorderRadius.only(
+                  bottomLeft: Radius.circular(16),
+                  bottomRight: Radius.circular(16),
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Theme.of(context).colorScheme.shadow.withOpacity(0.1),
+                    blurRadius: 4,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
+              ),
               child: Row(
                 children: [
-                  const Text(
+                  Text(
                     'Filter by Category:',
-                    style: TextStyle(color: Colors.white, fontSize: 14),
+                    style: GoogleFonts.poppins(
+                      color: Theme.of(context).colorScheme.onSurface,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                    ),
                   ),
                   const SizedBox(width: 8),
                   DropdownButton<String>(
                     value: _selectedCategory,
-                    hint: const Text('All', style: TextStyle(color: Colors.white)),
-                    dropdownColor: const Color(0xFF87CEEB),
-                    style: const TextStyle(color: Colors.white),
+                    hint: Text(
+                      'All',
+                      style: GoogleFonts.poppins(color: Theme.of(context).colorScheme.onSurface),
+                    ),
+                    dropdownColor: Theme.of(context).colorScheme.surface,
+                    style: GoogleFonts.poppins(color: Theme.of(context).colorScheme.onSurface),
                     items: [
                       const DropdownMenuItem<String>(
                         value: null,
@@ -237,14 +294,25 @@ class _SummaryPageState extends State<SummaryPage> with TickerProviderStateMixin
           Expanded(
             child: _filteredSummary.isEmpty
                 ? Center(
-                    child: Text(
-                      "No study records this $_period${_selectedCategory != null ? ' for $_selectedCategory' : ''}.\nStart learning 📚",
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: 16,
-                        color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
-                        fontWeight: FontWeight.w500,
-                      ),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.bar_chart_outlined,
+                          size: 80,
+                          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.3),
+                        ),
+                        const SizedBox(height: 16),
+                        Text(
+                          "No study records this $_period${_selectedCategory != null ? ' for $_selectedCategory' : ''}.\nStart learning 📚",
+                          textAlign: TextAlign.center,
+                          style: GoogleFonts.poppins(
+                            fontSize: 18,
+                            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ],
                     ),
                   )
                 : Column(
@@ -281,11 +349,11 @@ class _SummaryPageState extends State<SummaryPage> with TickerProviderStateMixin
                                             title: subject.name,
                                             color: _chartColors[index % _chartColors.length],
                                             radius: 60,
-                                            titleStyle: const TextStyle(
-                                              fontWeight: FontWeight.bold,
-                                              fontSize: 12,
-                                              color: Colors.black,
-                                            ),
+                                titleStyle: GoogleFonts.poppins(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 12,
+                                  color: Theme.of(context).colorScheme.onSurface,
+                                ),
                                           );
                                         }).toList(),
                                       ),
@@ -377,7 +445,7 @@ class _SummaryPageState extends State<SummaryPage> with TickerProviderStateMixin
                                 ),
                                 title: Text(
                                   subject.name,
-                                  style: TextStyle(
+                                  style: GoogleFonts.poppins(
                                     fontWeight: FontWeight.bold,
                                     color: Theme.of(context).colorScheme.onSurface,
                                   ),
@@ -388,11 +456,13 @@ class _SummaryPageState extends State<SummaryPage> with TickerProviderStateMixin
                                     RichText(
                                       text: TextSpan(
                                         text: "$sessions sessions • ",
-                                        style: TextStyle(color: _chartColors[index % _chartColors.length]),
+                                        style: GoogleFonts.poppins(
+                                          color: _chartColors[index % _chartColors.length],
+                                        ),
                                         children: [
                                           TextSpan(
                                             text: formatDuration(hours),
-                                            style: TextStyle(
+                                            style: GoogleFonts.poppins(
                                               color: _chartColors[index % _chartColors.length],
                                               fontWeight: FontWeight.bold,
                                             ),
@@ -414,7 +484,7 @@ class _SummaryPageState extends State<SummaryPage> with TickerProviderStateMixin
                                           const SizedBox(height: 2),
                                           Text(
                                             'Goal: ${(subject.weeklyGoalMinutes / 60).toStringAsFixed(1)} hours - ${(100 * (item['total_duration'] / subject.weeklyGoalMinutes).clamp(0.0, 1.0)).toStringAsFixed(1)}%',
-                                            style: TextStyle(
+                                            style: GoogleFonts.poppins(
                                               fontSize: 12,
                                               color: Theme.of(context).colorScheme.onSurfaceVariant,
                                             ),

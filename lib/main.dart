@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'providers/subject_provider.dart';
 import 'providers/study_record_provider.dart';
 import 'providers/goal_provider.dart';
@@ -28,13 +29,12 @@ class MyApp extends StatelessWidget {
         title: 'Study Time Tracker',
         theme: ThemeData(
           useMaterial3: true,
-          scaffoldBackgroundColor: const Color(0xFFF5F7FB),
-        colorScheme: ColorScheme.fromSeed(
-            seedColor: const Color(0xFF9C27B0),
+          scaffoldBackgroundColor: const Color(0xFFF8FAFC),
+          colorScheme: ColorScheme.fromSeed(
+            seedColor: const Color(0xFF6366F1), // Modern indigo
+            brightness: Brightness.light,
           ),
-          textTheme: const TextTheme(
-            bodyMedium: TextStyle(fontFamily: 'Roboto', fontSize: 16),
-          ),
+          textTheme: GoogleFonts.poppinsTextTheme(),
         ),
         darkTheme: ThemeData.dark(),
         themeMode: ThemeMode.system,

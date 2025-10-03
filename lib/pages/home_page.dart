@@ -88,7 +88,7 @@ class _HomePageState extends State<HomePage> {
       body: Container(
         decoration: const BoxDecoration(
           gradient: LinearGradient(
-            colors: [Color(0xFF87CEEB), Color(0xFFE0F7FA)],
+            colors: [Color(0xFFFF6B6B), Color(0xFF4ECDC4)],
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
           ),
@@ -100,7 +100,7 @@ class _HomePageState extends State<HomePage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const Text(
-                  'Good morning!',
+                  'Hey Student! 🚀',
                   style: TextStyle(
                     fontSize: 28,
                     fontWeight: FontWeight.bold,
@@ -109,7 +109,7 @@ class _HomePageState extends State<HomePage> {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  'Ready to study today? 📚',
+                  'Ready to study today? 📚✨',
                   style: TextStyle(
                     fontSize: 16,
                     color: Colors.white.withOpacity(0.9),
@@ -132,7 +132,7 @@ class _HomePageState extends State<HomePage> {
                   ),
                   child: Row(
                     children: [
-                      const Icon(Icons.access_time, size: 40, color: Color(0xFF87CEEB)),
+                      const Icon(Icons.access_time, size: 40, color: Colors.green),
                       const SizedBox(width: 16),
                       Expanded(
                         child: Column(
@@ -200,7 +200,7 @@ class _HomePageState extends State<HomePage> {
                             child: LinearProgressIndicator(
                               value: _weeklyGoal > 0 ? (_weeklyTotal / _weeklyGoal).clamp(0.0, 1.0) : 0.0,
                               backgroundColor: Colors.grey.shade200,
-                              color: const Color(0xFF87CEEB),
+                              color: Colors.purple,
                               minHeight: 8,
                             ),
                           ),
@@ -270,7 +270,7 @@ class _HomePageState extends State<HomePage> {
                   ),
                   child: Row(
                     children: [
-                      const Icon(Icons.notifications, size: 40, color: Color(0xFF87CEEB)),
+                      const Icon(Icons.notifications, size: 40, color: Colors.purple),
                       const SizedBox(width: 16),
                       Expanded(
                         child: Column(
