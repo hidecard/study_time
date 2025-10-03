@@ -4,7 +4,9 @@ import 'package:google_fonts/google_fonts.dart';
 import 'providers/subject_provider.dart';
 import 'providers/study_record_provider.dart';
 import 'providers/goal_provider.dart';
-import 'pages/home_page.dart';
+import 'providers/user_preferences_provider.dart';
+import 'providers/notification_provider.dart';
+import 'pages/home_page.dart' as dashboard;
 import 'pages/subjects_page.dart';
 import 'pages/summary_page.dart';
 import 'pages/calendar_page.dart';
@@ -23,22 +25,19 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => SubjectProvider()),
         ChangeNotifierProvider(create: (_) => StudyRecordProvider()),
         ChangeNotifierProvider(create: (_) => GoalProvider()),
+        ChangeNotifierProvider(create: (_) => UserPreferencesProvider()..loadPreferences()),
+        ChangeNotifierProvider(create: (_) => NotificationProvider()),
       ],
-      child: MaterialApp(
-        debugShowCheckedModeBanner: false,
-        title: 'Study Time Tracker',
-        theme: ThemeData(
-          useMaterial3: true,
-          scaffoldBackgroundColor: const Color(0xFFF8FAFC),
-          colorScheme: ColorScheme.fromSeed(
-            seedColor: const Color(0xFF6366F1), // Modern indigo
-            brightness: Brightness.light,
-          ),
-          textTheme: GoogleFonts.poppinsTextTheme(),
-        ),
-        darkTheme: ThemeData.dark(),
-        themeMode: ThemeMode.system,
-        home: const HomePage(),
+      child: Consumer<UserPreferencesProvider>(
+        builder: (context, userPrefs, child) {
+          return MaterialApp(
+            debugShowCheckedModeBanner: false,
+            title: 'Study Time Tracker',
+            theme: userPrefs.getThemeData(),
+            themeMode: userPrefs.darkModeEnabled ? ThemeMode.dark : ThemeMode.light,
+            home: const HomePage(),
+          );
+        },
       ),
     );
   }
@@ -54,10 +53,11 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   int _selectedIndex = 0;
 
-  static const List<Widget> _pages = <Widget>[
-    SubjectsPage(),
-    SummaryPage(),
-    CalendarPage(),
+  static final List<Widget> _pages = <Widget>[
+    const dashboard.DashboardPage(), // Dashboard
+    const SubjectsPage(),
+    const SummaryPage(),
+    const CalendarPage(),
   ];
 
   void _onItemTapped(int index) {
@@ -92,6 +92,11 @@ class _HomePageState extends State<HomePage> {
           elevation: 0,
           type: BottomNavigationBarType.fixed,
           items: const <BottomNavigationBarItem>[
+            BottomNavigationBarItem(
+              icon: Icon(Icons.home_outlined),
+              activeIcon: Icon(Icons.home, size: 28),
+              label: 'Home',
+            ),
             BottomNavigationBarItem(
               icon: Icon(Icons.book_outlined),
               activeIcon: Icon(Icons.book, size: 28),

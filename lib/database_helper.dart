@@ -58,6 +58,15 @@ class DatabaseHelper {
       )
     ''');
 
+    await db.execute('''
+      CREATE TABLE notification_reminders (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        title TEXT NOT NULL,
+        body TEXT NOT NULL,
+        time TEXT NOT NULL,
+        enabled INTEGER DEFAULT 1
+      )
+    ''');
 
   }
 
@@ -159,5 +168,39 @@ class DatabaseHelper {
     return await db.delete('goals', where: 'id = ?', whereArgs: [id]);
   }
 
+  // Notification Reminders CRUD
+  Future<int> insertNotificationReminder(Map<String, dynamic> row) async {
+    Database db = await database;
+    return await db.insert('notification_reminders', row);
+  }
 
+  Future<List<Map<String, dynamic>>> queryAllNotificationReminders() async {
+    Database db = await database;
+    return await db.query('notification_reminders');
+  }
+
+  Future<int> updateNotificationReminder(int id, Map<String, dynamic> row) async {
+    Database db = await database;
+    return await db.update('notification_reminders', row, where: 'id = ?', whereArgs: [id]);
+  }
+
+  Future<int> deleteNotificationReminder(int id) async {
+    Database db = await database;
+    return await db.delete('notification_reminders', where: 'id = ?', whereArgs: [id]);
+  }
+
+  Future<int> rawInsert(String sql, [List<dynamic>? arguments]) async {
+    Database db = await database;
+    return await db.rawInsert(sql, arguments ?? []);
+  }
+
+  Future<int> rawUpdate(String sql, [List<dynamic>? arguments]) async {
+    Database db = await database;
+    return await db.rawUpdate(sql, arguments ?? []);
+  }
+
+  Future<int> rawDelete(String sql, [List<dynamic>? arguments]) async {
+    Database db = await database;
+    return await db.rawDelete(sql, arguments ?? []);
+  }
 }

@@ -45,7 +45,19 @@ class _HistoryPageState extends State<HistoryPage> {
           '${widget.subject.name} History',
           style: TextStyle(fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onPrimary),
         ),
-        backgroundColor: Theme.of(context).colorScheme.primary,
+        backgroundColor: null,
+        flexibleSpace: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [
+                Colors.deepPurpleAccent,
+                Colors.pinkAccent,
+              ],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+          ),
+        ),
         iconTheme: IconThemeData(color: Theme.of(context).colorScheme.onPrimary),
         elevation: 4,
       ),

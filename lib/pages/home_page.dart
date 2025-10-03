@@ -1,27 +1,44 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../database_helper.dart';
 import '../models/subject.dart';
 import '../providers/subject_provider.dart';
+import '../providers/user_preferences_provider.dart';
 
-class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+class DashboardPage extends StatefulWidget {
+  const DashboardPage({super.key});
 
   @override
-  State<HomePage> createState() => _HomePageState();
+  State<DashboardPage> createState() => _DashboardPageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _DashboardPageState extends State<DashboardPage> {
   double _todayStudied = 0.0;
   double _weeklyTotal = 0.0;
   double _weeklyGoal = 0.0;
   int _currentStreak = 0;
   String _nextReminder = 'No reminder set';
 
+  String _greeting = '';
+  String _dailyQuote = '';
+  bool _isLoading = true;
+
   @override
   void initState() {
     super.initState();
     _loadDashboardData();
+    _loadUserPreferences();
+  }
+
+  Future<void> _loadUserPreferences() async {
+    final userPrefs = context.read<UserPreferencesProvider>();
+    await userPrefs.loadPreferences();
+    setState(() {
+      _greeting = userPrefs.getGreeting() + ', ' + userPrefs.userName + ' 👋';
+      _dailyQuote = userPrefs.dailyQuote;
+      _isLoading = false;
+    });
   }
 
   Future<void> _loadDashboardData() async {
@@ -52,18 +69,25 @@ class _HomePageState extends State<HomePage> {
     final studyDates = streakData.map((row) => DateTime.parse(row['study_date'] as String)).toList();
     _currentStreak = _calculateStreak(studyDates);
 
+    // Check for achievements
+    final totalStudyHours = await dbHelper.rawQuery('SELECT SUM(duration) as total FROM study_records');
+    final totalHours = (totalStudyHours.first['total'] as int? ?? 0) / 60.0;
+    final totalSessions = await dbHelper.rawQuery('SELECT COUNT(*) as count FROM study_records');
+    final sessionsCount = totalSessions.first['count'] as int? ?? 0;
+    await context.read<UserPreferencesProvider>().checkAndAwardAchievements(totalHours, _currentStreak, sessionsCount);
+
     setState(() {});
   }
 
   int _calculateStreak(List<DateTime> studyDates) {
     if (studyDates.isEmpty) return 0;
     int streak = 1;
-    for (int i = 0; i < studyDates.length - 1; i++) {
-      final current = studyDates[i];
-      final next = studyDates[i + 1];
-      final difference = current.difference(next).inDays;
+    DateTime previousDate = studyDates[0];
+    for (int i = 1; i < studyDates.length; i++) {
+      final difference = previousDate.difference(studyDates[i]).inDays;
       if (difference == 1) {
         streak++;
+        previousDate = studyDates[i];
       } else if (difference > 1) {
         break;
       }
@@ -71,236 +95,185 @@ class _HomePageState extends State<HomePage> {
     return streak;
   }
 
-  String formatDuration(double hours) {
-    int totalMinutes = (hours * 60).round();
-    int fullHours = totalMinutes ~/ 60;
-    int minutes = totalMinutes % 60;
-    if (minutes == 0) {
-      return '$fullHours hour${fullHours != 1 ? 's' : ''}';
-    } else {
-      return '$fullHours hour${fullHours != 1 ? 's' : ''} $minutes min';
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
+    final userPrefs = context.watch<UserPreferencesProvider>();
+
     return Scaffold(
-      body: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            colors: [Color(0xFFFF6B6B), Color(0xFF4ECDC4)],
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-          ),
-        ),
-        child: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.all(20),
-            child: Column(
+      body: _isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
-                  'Hey Student! 🚀',
-                  style: TextStyle(
-                    fontSize: 28,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  'Ready to study today? 📚✨',
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: Colors.white.withOpacity(0.9),
-                  ),
-                ),
-                const SizedBox(height: 40),
-                // Today's study
+                // 🔹 Modern Header
                 Container(
-                  padding: const EdgeInsets.all(20),
+                  padding: const EdgeInsets.fromLTRB(20, 60, 20, 30),
+                  width: double.infinity,
                   decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(20),
+                    gradient: LinearGradient(
+                      colors: [
+                        Colors.deepPurpleAccent,
+                        Colors.pinkAccent,
+                      ],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                    borderRadius: const BorderRadius.only(
+                      bottomLeft: Radius.circular(28),
+                      bottomRight: Radius.circular(28),
+                    ),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.1),
+                        color: Theme.of(context).colorScheme.shadow.withOpacity(0.2),
                         blurRadius: 10,
-                        offset: const Offset(0, 5),
-                      ),
-                    ],
-                  ),
-                  child: Row(
-                    children: [
-                      const Icon(Icons.access_time, size: 40, color: Colors.green),
-                      const SizedBox(width: 16),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const Text(
-                              'Today studied',
-                              style: TextStyle(
-                                fontSize: 16,
-                                color: Colors.grey,
-                              ),
-                            ),
-                            Text(
-                              formatDuration(_todayStudied),
-                              style: const TextStyle(
-                                fontSize: 24,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.black,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 20),
-                // Weekly progress
-                Container(
-                  padding: const EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(20),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.1),
-                        blurRadius: 10,
-                        offset: const Offset(0, 5),
+                        offset: const Offset(0, 4),
                       ),
                     ],
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
-                        'This week total',
-                        style: TextStyle(
-                          fontSize: 16,
-                          color: Colors.grey,
+                      Text(
+                        _greeting,
+                        style: GoogleFonts.poppins(
+                          fontSize: 28,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
                         ),
                       ),
                       const SizedBox(height: 8),
-                      Row(
-                        children: [
-                          Text(
-                            '${_weeklyTotal.toStringAsFixed(1)}h / ${_weeklyGoal.toStringAsFixed(1)}h goal',
-                            style: const TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black,
-                            ),
+                      Container(
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.2),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Text(
+                          '"$_dailyQuote"',
+                          style: GoogleFonts.poppins(
+                            fontSize: 16,
+                            fontStyle: FontStyle.italic,
+                            color: Colors.white,
                           ),
-                          const SizedBox(width: 16),
-                          Expanded(
-                            child: LinearProgressIndicator(
-                              value: _weeklyGoal > 0 ? (_weeklyTotal / _weeklyGoal).clamp(0.0, 1.0) : 0.0,
-                              backgroundColor: Colors.grey.shade200,
-                              color: Colors.purple,
-                              minHeight: 8,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 20),
-                // Streak
-                Container(
-                  padding: const EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(20),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.1),
-                        blurRadius: 10,
-                        offset: const Offset(0, 5),
-                      ),
-                    ],
-                  ),
-                  child: Row(
-                    children: [
-                      const Icon(Icons.local_fire_department, size: 40, color: Colors.orange),
-                      const SizedBox(width: 16),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const Text(
-                              'Current Streak',
-                              style: TextStyle(
-                                fontSize: 16,
-                                color: Colors.grey,
-                              ),
-                            ),
-                            Text(
-                              '🔥 $_currentStreak day${_currentStreak != 1 ? 's' : ''}',
-                              style: const TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.black,
-                              ),
-                            ),
-                          ],
+                          textAlign: TextAlign.center,
                         ),
                       ),
                     ],
                   ),
                 ),
-                const SizedBox(height: 20),
-                // Next reminder
-                Container(
-                  padding: const EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(20),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.1),
-                        blurRadius: 10,
-                        offset: const Offset(0, 5),
-                      ),
-                    ],
-                  ),
-                  child: Row(
-                    children: [
-                      const Icon(Icons.notifications, size: 40, color: Colors.purple),
-                      const SizedBox(width: 16),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+
+                // 🔹 Dashboard Content
+                Expanded(
+                  child: SingleChildScrollView(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
                           children: [
-                            const Text(
-                              'Next reminder',
-                              style: TextStyle(
-                                fontSize: 16,
-                                color: Colors.grey,
+                            Expanded(
+                              child: _buildStatCard(
+                                'Today',
+                                '${_todayStudied.toStringAsFixed(1)}h',
+                                Icons.today,
+                                Colors.blue,
                               ),
                             ),
-                            Text(
-                              _nextReminder,
-                              style: const TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.black,
+                            const SizedBox(width: 16),
+                            Expanded(
+                              child: _buildStatCard(
+                                'This Week',
+                                '${_weeklyTotal.toStringAsFixed(1)}h',
+                                Icons.calendar_view_week,
+                                Colors.green,
                               ),
                             ),
                           ],
                         ),
-                      ),
-                    ],
+                        const SizedBox(height: 16),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: _buildStatCard(
+                                'Weekly Goal',
+                                '${_weeklyGoal.toStringAsFixed(1)}h',
+                                Icons.flag,
+                                Colors.orange,
+                              ),
+                            ),
+                            const SizedBox(width: 16),
+                            Expanded(
+                              child: _buildStatCard(
+                                'Streak',
+                                '$_currentStreak days',
+                                Icons.local_fire_department,
+                                Colors.red,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 32),
+                        if (userPrefs.achievements.isNotEmpty)
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Recent Achievements',
+                                style: GoogleFonts.poppins(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+                              Wrap(
+                                spacing: 8,
+                                runSpacing: 8,
+                                children: userPrefs.achievements.take(3).map((achievement) {
+                                  return Chip(
+                                    label: Text(achievement),
+                                    avatar: const Icon(Icons.emoji_events),
+                                  );
+                                }).toList(),
+                              ),
+                            ],
+                          ),
+                      ],
+                    ),
                   ),
                 ),
               ],
             ),
+    );
+  }
+
+  Widget _buildStatCard(String title, String value, IconData icon, Color color) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: color.withOpacity(0.3)),
+      ),
+      child: Column(
+        children: [
+          Icon(icon, color: color, size: 32),
+          const SizedBox(height: 8),
+          Text(
+            value,
+            style: GoogleFonts.poppins(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: color,
+            ),
           ),
-        ),
+          Text(
+            title,
+            style: GoogleFonts.poppins(
+              fontSize: 12,
+              color: color.withOpacity(0.7),
+            ),
+          ),
+        ],
       ),
     );
   }

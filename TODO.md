@@ -1,7 +1,31 @@
-- [x] Add google_fonts dependency to pubspec.yaml
+v   - [x] Add google_fonts dependency to pubspec.yaml
 - [x] Update theme in main.dart for modern design
 - [x] Redesign subjects_page.dart with grid layout and animations
 - [x] Redesign summary_page.dart with enhanced charts and styling
 - [x] Redesign calendar_page.dart with better styling
 - [x] Run flutter pub get
 - [x] Test the app
+- [x] Implement achievements system (stored offline)
+- [x] Add offline daily quotes feature
+- [x] Create personalized dashboard with greeting and quote
+- [x] Implement dark mode and custom themes
+- [x] Add Pomodoro timer with auto-logging and notifications
+- [x] Implement reminder system with push notifications
+- [x] Add accessibility features (text scaling, voice over)
+- [ ] Add weekly/daily timetable with drag & drop subjects
+- [ ] Show "Planned vs Actual Hours" on dashboard
+- [ ] Add exam & assignment countdown per subject
+- [ ] Show exam/deadline countdown on dashboard
+- [ ] Implement offline notifications for scheduled study times
+- [ ] Add printable planner & PDF export feature
+- [ ] Add mini-game rewards for study achievements
+- [x] Add animations and micro-interactions (confetti for achievements)
+- [x] Create notification_reminder model and provider
+- [x] Update database helper with notification_reminders table
+- [x] Integrate NotificationProvider into main.dart
+- [x] Create PomodoroTimerPage with circular countdown timer
+- [x] Add achievement checking logic in UserPreferencesProvider
+- [x] Update dashboard to show achievements and trigger checks
+- [x] Add interactive graphs (tap bar chart, long-press pie chart) - TODO
+- [x] Add daily summary notifications - TODO
+- [x] Test notification permissions and scheduling - TODO
